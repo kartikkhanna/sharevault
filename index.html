@@ -3,504 +3,524 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
-<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
-<title>SHARE Anniversary — Activation Read-Out</title>
+<meta name="theme-color" content="#fafafa" />
+<title>SHARE Anniversary — Activation Dashboard</title>
 
-<!-- Distinctive typography pairing: Fraunces (display) + Inter Tight (body) -->
+<!-- Typography: Poppins (matches SHARE MAF dashboard aesthetic) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Chart.js for visualizations -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
 <style>
 /* =========================================================
-   CONFIG — set this once
-   ========================================================= */
-/* See <script> tag at bottom for API_URL config */
-
-/* =========================================================
-   CSS RESET + BASE
+   RESET + BASE
    ========================================================= */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-body { font-family: 'Inter Tight', sans-serif; font-weight: 400; line-height: 1.5; }
+body {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400;
+  line-height: 1.4;
+  font-size: 14px;
+  background: #f8f8fa;
+  color: #1a1a1a;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
 /* =========================================================
-   THEME TOKENS — light is default, dark via [data-theme="dark"]
+   THEME — light default with dark toggle
    ========================================================= */
 :root {
-  --ink: #0a0a0a;
-  --graphite: #3a3a3a;
+  --ink: #1a1a1a;
+  --ink-soft: #3a3a3a;
   --slate: #6b6b6b;
   --muted: #9a9a9a;
-  --whisper: #c4c4c4;
-  --hairline: #eaeaea;
-  --divider: #d4d4d4;
-  --paper: #fafafa;
+  --whisper: #cccccc;
+  --hairline: #ececec;
+  --divider: #d8d8d8;
+  --page-bg: #f6f7f9;
   --card: #ffffff;
-  --tint: #f5f5f5;
-  --accent: #e6007e;
-  --accent-deep: #b0005f;
-  --accent-pale: #fdf2f8;
+  --card-tint: #fafafa;
+
+  /* SHARE brand */
+  --pink: #e6007e;
+  --pink-deep: #b80064;
+  --pink-soft: #ff4ba8;
+  --pink-pale: #fde7f2;
+  --pink-whisper: #fef5fa;
+  --purple: #3b2a87;
+  --purple-deep: #2a1d6b;
+
+  /* Gradient (mint -> cream -> lavender from SHARE MAF dashboard) */
+  --grad-1: #d8f0e0;
+  --grad-2: #f5f0e0;
+  --grad-3: #ecdcf2;
+
+  /* States */
   --success: #1f8a4c;
   --success-tint: #e3f4ea;
   --danger: #c8102e;
   --danger-tint: #fde7e9;
   --warn: #c77e00;
-  --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 16px -4px rgba(0,0,0,0.08), 0 1px 3px -1px rgba(0,0,0,0.05);
-  --shadow-lg: 0 24px 48px -16px rgba(0,0,0,0.12), 0 4px 12px -4px rgba(0,0,0,0.06);
-}
 
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.03);
+  --shadow-elev: 0 4px 16px -4px rgba(230,0,126,0.12), 0 1px 3px rgba(0,0,0,0.04);
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+}
 [data-theme="dark"] {
   --ink: #f5f5f5;
-  --graphite: #d4d4d4;
+  --ink-soft: #d4d4d4;
   --slate: #a1a1a1;
   --muted: #737373;
   --whisper: #525252;
   --hairline: #1f1f1f;
   --divider: #2a2a2a;
-  --paper: #0a0a0a;
+  --page-bg: #0a0a0a;
   --card: #141414;
-  --tint: #1a1a1a;
-  --accent: #ff3399;
-  --accent-deep: #ff66b3;
-  --accent-pale: #2a0a1a;
-  --success: #4ade80;
-  --success-tint: #0e2a1a;
-  --danger: #f87171;
-  --danger-tint: #2a0a0a;
-  --warn: #fbbf24;
-  --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.4);
-  --shadow-md: 0 4px 16px -4px rgba(0,0,0,0.6), 0 1px 3px -1px rgba(0,0,0,0.4);
-  --shadow-lg: 0 24px 48px -16px rgba(0,0,0,0.8), 0 4px 12px -4px rgba(0,0,0,0.5);
+  --card-tint: #1a1a1a;
+  --pink-pale: #2a0a1a;
+  --pink-whisper: #1a0612;
+  --grad-1: #1a2620;
+  --grad-2: #1f1d18;
+  --grad-3: #1f1525;
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.04);
+  --shadow-elev: 0 4px 16px -4px rgba(255,51,153,0.2), 0 1px 3px rgba(0,0,0,0.4);
 }
-
-body {
-  background: var(--paper);
-  color: var(--ink);
-  min-height: 100vh;
-  transition: background-color 240ms ease, color 240ms ease;
-}
+body { background: var(--page-bg); color: var(--ink); transition: background 240ms, color 240ms; }
 
 /* =========================================================
-   LAYOUT — generous editorial spacing
+   HEADER BAND with gradient
    ========================================================= */
-.shell {
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 56px 48px 80px;
+.header-band {
+  background: linear-gradient(135deg, var(--grad-1) 0%, var(--grad-2) 50%, var(--grad-3) 100%);
+  padding: 24px 32px 20px;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  position: relative;
 }
-@media (max-width: 768px) {
-  .shell { padding: 32px 20px 56px; }
-}
-
-/* =========================================================
-   TOP BAR — title, partners, theme toggle, refresh
-   ========================================================= */
-.top {
+.header-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding-bottom: 24px;
-  margin-bottom: 0;
-  border-bottom: 1px solid var(--divider);
-  animation: slideDown 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  flex-wrap: wrap;
+  max-width: 1600px;
+  margin: 0 auto;
 }
-.brand-block .title {
-  font-family: 'Fraunces', serif;
-  font-weight: 400;
-  font-size: clamp(36px, 5vw, 56px);
-  line-height: 1.0;
-  letter-spacing: -0.02em;
-  color: var(--ink);
-}
-.brand-block .subtitle {
-  font-family: 'Inter Tight', sans-serif;
-  font-size: 13px;
-  font-weight: 400;
-  color: var(--slate);
-  letter-spacing: 0.01em;
-  margin-top: 8px;
-}
-.meta-block {
-  text-align: right;
+.brand-block {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
+  align-items: center;
+  gap: 16px;
 }
-.partners {
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  color: var(--muted);
-  text-transform: uppercase;
+.title-stack .title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
 }
-.timestamp {
-  font-family: 'JetBrains Mono', monospace;
+.title-stack .title .pink-word { color: var(--pink); font-weight: 700; }
+.title-stack .title .purple-word { color: var(--purple); font-weight: 700; }
+.title-stack .subtitle {
   font-size: 11px;
-  color: var(--muted);
+  color: var(--slate);
+  margin-top: 2px;
   letter-spacing: 0.02em;
 }
-.toggle-row {
+
+.meta-block {
   display: flex;
-  gap: 8px;
-  margin-top: 12px;
+  align-items: center;
+  gap: 14px;
+  font-size: 11px;
+  color: var(--slate);
 }
+.meta-block .timestamp {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.partners {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--slate);
+  text-transform: uppercase;
+  padding-right: 14px;
+  border-right: 1px solid rgba(0,0,0,0.1);
+}
+[data-theme="dark"] .partners { border-right-color: rgba(255,255,255,0.1); }
+
 .icon-btn {
   background: var(--card);
   border: 1px solid var(--hairline);
   color: var(--slate);
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  display: flex;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   font-family: inherit;
   transition: all 160ms ease;
 }
-.icon-btn:hover {
-  background: var(--tint);
-  color: var(--ink);
-  border-color: var(--divider);
-}
-.icon-btn svg { width: 16px; height: 16px; }
+.icon-btn:hover { background: var(--card-tint); color: var(--ink); border-color: var(--divider); }
+.icon-btn svg { width: 14px; height: 14px; }
 .icon-btn.spinning svg { animation: spin 700ms linear infinite; }
 
-/* =========================================================
-   PERIOD STRIP — progress through 32-day window
-   ========================================================= */
-.period-strip {
-  padding: 20px 0 0 0;
-  margin-bottom: 0;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  animation: slideDown 600ms cubic-bezier(0.16, 1, 0.3, 1) 60ms both;
-}
-.period-text {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--accent);
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-}
-.period-track {
-  flex: 1;
-  height: 2px;
-  background: var(--hairline);
-  border-radius: 1px;
-  overflow: hidden;
-  position: relative;
-}
-.period-fill {
-  height: 100%;
-  background: var(--accent);
-  width: 0%;
-  border-radius: 1px;
-  transition: width 1200ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-.period-marker {
-  position: absolute;
-  top: -3px;
-  width: 8px;
-  height: 8px;
-  background: var(--accent);
-  border-radius: 50%;
-  transform: translateX(-50%);
-  opacity: 0;
-  transition: opacity 400ms 1200ms ease, left 1200ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-.period-marker.show { opacity: 1; }
-
-/* =========================================================
-   FILTER BAR — pill-style segmented controls
-   ========================================================= */
+/* Filter bar (inside header band) */
 .filter-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 32px 0 0;
-  margin-top: 24px;
-  border-top: 1px solid var(--hairline);
+  gap: 12px;
   flex-wrap: wrap;
-  animation: slideUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 120ms both;
+  max-width: 1600px;
+  margin: 16px auto 0;
 }
-.filter-group { display: flex; align-items: center; gap: 12px; }
-.filter-label {
+.filter-pill {
+  background: var(--card);
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 999px;
+  padding: 6px 6px 6px 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+[data-theme="dark"] .filter-pill { border-color: rgba(255,255,255,0.06); }
+.filter-pill .label {
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.16em;
-  color: var(--muted);
+  color: var(--slate);
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 .segmented {
   display: inline-flex;
-  background: var(--tint);
-  border-radius: 10px;
-  padding: 3px;
+  background: transparent;
   gap: 0;
-  border: 1px solid var(--hairline);
 }
 .segmented button {
   background: transparent;
   border: none;
   color: var(--slate);
   font-family: inherit;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
-  padding: 8px 14px;
-  border-radius: 7px;
+  padding: 6px 12px;
+  border-radius: 999px;
   cursor: pointer;
   transition: all 200ms ease;
-  letter-spacing: 0.01em;
 }
 .segmented button:hover { color: var(--ink); }
 .segmented button.active {
-  background: var(--card);
-  color: var(--ink);
-  box-shadow: var(--shadow-sm);
+  background: var(--ink);
+  color: var(--card);
 }
 .date-input {
-  background: var(--card);
-  border: 1px solid var(--hairline);
+  background: transparent;
+  border: none;
   color: var(--ink);
   font-family: inherit;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
   cursor: pointer;
-  transition: all 160ms ease;
+  outline: none;
 }
-.date-input:hover { border-color: var(--divider); }
-.date-input:focus { outline: none; border-color: var(--accent); }
-.date-input[disabled] { opacity: 0.4; cursor: not-allowed; }
+.date-input[disabled] { opacity: 0.3; cursor: not-allowed; }
 
-/* =========================================================
-   SECTION HEADER — small caps, letter-spaced
-   ========================================================= */
-.section {
-  margin-top: 64px;
-  animation: fadeIn 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-.section-head {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-bottom: 32px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid var(--hairline);
-}
-
-/* =========================================================
-   HERO — the one number that matters most
-   ========================================================= */
-.hero {
-  display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  gap: 64px;
-  align-items: end;
-}
-@media (max-width: 768px) {
-  .hero { grid-template-columns: 1fr; gap: 32px; }
-}
-.hero-left .hero-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-bottom: 16px;
-}
-.hero-left .hero-number {
-  font-family: 'Fraunces', serif;
-  font-weight: 300;
-  font-size: clamp(80px, 14vw, 168px);
-  line-height: 0.9;
-  letter-spacing: -0.04em;
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
-}
-.hero-left .hero-caption {
-  font-size: 13px;
-  color: var(--slate);
-  margin-top: 12px;
-  letter-spacing: 0.01em;
-}
-.hero-right {
+/* Progress strip */
+.progress-strip {
+  max-width: 1600px;
+  margin: 14px auto 0;
   display: flex;
-  flex-direction: column;
-  gap: 0;
-  padding-bottom: 24px;
-}
-.hero-breakdown-row {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  align-items: baseline;
-  gap: 16px;
-  padding: 20px 0;
-  border-top: 1px solid var(--hairline);
-}
-.hero-breakdown-row:last-child { border-bottom: 1px solid var(--hairline); }
-.hbr-label { font-size: 14px; color: var(--graphite); font-weight: 400; }
-.hbr-num {
-  font-family: 'Fraunces', serif;
-  font-size: 28px;
-  font-weight: 400;
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-}
-.hbr-pct {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: var(--slate);
-  min-width: 44px;
-  text-align: right;
-}
-
-/* =========================================================
-   PERFORMANCE STRIP — secondary KPIs
-   ========================================================= */
-.perf-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 48px;
-}
-@media (max-width: 768px) {
-  .perf-grid { grid-template-columns: 1fr; gap: 32px; }
-}
-.perf-tile .label {
+  align-items: center;
+  gap: 14px;
   font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-bottom: 12px;
-}
-.perf-tile .num {
-  font-family: 'Fraunces', serif;
-  font-size: 56px;
-  font-weight: 300;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink);
-}
-.perf-tile.accent .num { color: var(--accent); }
-.perf-tile .hint {
-  font-size: 12px;
-  color: var(--slate);
-  margin-top: 10px;
-  letter-spacing: 0.01em;
-}
-
-/* =========================================================
-   LOCATION TABLE — clean, hairlines only
-   ========================================================= */
-.loc-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.loc-table th, .loc-table td {
-  text-align: right;
-  padding: 20px 16px;
-  font-variant-numeric: tabular-nums;
-  border-bottom: 1px solid var(--hairline);
-}
-.loc-table th {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  color: var(--muted);
-  text-transform: uppercase;
-}
-.loc-table td {
-  font-size: 18px;
-  font-weight: 400;
-  color: var(--ink);
-}
-.loc-table th:first-child, .loc-table td:first-child { text-align: left; }
-.loc-table td:first-child {
-  font-size: 15px;
-  color: var(--ink);
   font-weight: 500;
+  letter-spacing: 0.02em;
 }
-.loc-table td:first-child .loc-full {
-  display: block;
-  font-size: 12px;
-  color: var(--muted);
-  font-weight: 400;
-  margin-top: 4px;
+.progress-strip .text-left { color: var(--pink); font-weight: 600; }
+.progress-strip .text-right { color: var(--slate); }
+.progress-track {
+  flex: 1;
+  height: 3px;
+  background: rgba(0,0,0,0.05);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
 }
-.loc-table .total-col { color: var(--accent); font-weight: 500; }
-.loc-table tbody tr.inactive td { opacity: 0.4; }
-.loc-table tbody tr.inactive .status { font-size: 10px; color: var(--muted); }
+[data-theme="dark"] .progress-track { background: rgba(255,255,255,0.08); }
+.progress-fill {
+  height: 100%;
+  background: var(--pink);
+  width: 0;
+  border-radius: 2px;
+  transition: width 1200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.progress-marker {
+  position: absolute;
+  top: -3px;
+  width: 9px;
+  height: 9px;
+  background: var(--pink);
+  border-radius: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 0 3px var(--card);
+  transition: left 1200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
 
 /* =========================================================
-   ESTIMATOR — interactive cards
+   MAIN BODY (below header)
    ========================================================= */
-.estimator {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 48px;
+.main {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 20px 32px 32px;
 }
-@media (max-width: 768px) { .estimator { grid-template-columns: 1fr; gap: 32px; } }
+@media (max-width: 1200px) {
+  .main { padding: 16px 20px; }
+  .header-band { padding: 20px; }
+}
 
-.est-side .est-label {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-bottom: 24px;
-}
-.est-inputs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 32px;
-}
-.est-input-cell {
-  padding: 16px 0;
-  border-top: 1px solid var(--hairline);
-}
-.est-input-cell .ic-label {
-  font-size: 11px;
-  color: var(--slate);
-  margin-bottom: 8px;
-  letter-spacing: 0.04em;
-}
-.est-input-cell .ic-value {
-  font-family: 'Fraunces', serif;
-  font-size: 32px;
-  font-weight: 400;
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-  line-height: 1;
-}
-.est-input-cell.editable {
-  cursor: pointer;
+/* =========================================================
+   SECTION CARDS — SHARE MAF style rounded containers
+   ========================================================= */
+.section-card {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  box-shadow: var(--shadow-card);
   position: relative;
 }
-.est-input-cell.editable .ic-value {
-  color: var(--accent);
-  border-bottom: 2px dashed var(--accent);
-  display: inline-block;
-  padding-bottom: 4px;
-  transition: all 160ms ease;
+
+.section-head {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-.est-input-cell.editable:hover .ic-value {
-  border-bottom-style: solid;
+.section-head .label-soft { font-weight: 400; color: var(--slate); }
+.section-head .small-meta {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   GRID LAYOUT — one screen
+   ========================================================= */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: minmax(min-content, max-content);
+  gap: 12px;
+}
+
+/* KPI strip row — 6 metrics across the top */
+.kpi-strip {
+  grid-column: span 12;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+}
+@media (max-width: 1200px) {
+  .kpi-strip { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 700px) {
+  .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+}
+
+.kpi-card {
+  background: var(--card);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card .kpi-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--slate);
+}
+.kpi-card .kpi-value {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.kpi-card.accent .kpi-value { color: var(--pink); }
+.kpi-card .kpi-sub {
+  font-size: 11px;
+  color: var(--slate);
+  font-weight: 500;
+}
+.kpi-card .kpi-sub .pct-up { color: var(--success); font-weight: 600; }
+.kpi-card .kpi-sub .pct-pink { color: var(--pink); font-weight: 600; }
+.kpi-card.hero {
+  background: linear-gradient(135deg, var(--pink) 0%, var(--pink-deep) 100%);
+  color: white;
+  box-shadow: var(--shadow-elev);
+}
+.kpi-card.hero .kpi-label,
+.kpi-card.hero .kpi-value,
+.kpi-card.hero .kpi-sub { color: white; }
+.kpi-card.hero .kpi-label { opacity: 0.85; }
+.kpi-card.hero .kpi-sub { opacity: 0.8; }
+
+/* Chart card sizes */
+.chart-card {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.chart-card .chart-wrap {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+.chart-card canvas { max-height: 100%; }
+
+/* Specific section spans */
+.span-daily-trend { grid-column: span 8; min-height: 280px; }
+.span-funnel { grid-column: span 4; min-height: 280px; }
+.span-location { grid-column: span 5; min-height: 260px; }
+.span-cumulative { grid-column: span 4; min-height: 260px; }
+.span-dow { grid-column: span 3; min-height: 260px; }
+.span-prizes { grid-column: span 7; min-height: 240px; }
+.span-estimator { grid-column: span 5; min-height: 240px; }
+.span-dq { grid-column: span 12; min-height: 100px; }
+
+@media (max-width: 1400px) {
+  .span-daily-trend { grid-column: span 12; }
+  .span-funnel { grid-column: span 12; }
+  .span-location { grid-column: span 6; }
+  .span-cumulative { grid-column: span 6; }
+  .span-dow { grid-column: span 6; }
+  .span-prizes { grid-column: span 6; }
+  .span-estimator { grid-column: span 12; }
+}
+@media (max-width: 900px) {
+  .dashboard-grid > * { grid-column: span 12 !important; }
+}
+
+/* =========================================================
+   FUNNEL — custom CSS visual
+   ========================================================= */
+.funnel-vis {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 0;
+}
+.funnel-row {
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+.funnel-row .fr-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  letter-spacing: 0.02em;
+}
+.funnel-bar-track {
+  height: 28px;
+  background: var(--card-tint);
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+}
+.funnel-bar-fill {
+  height: 100%;
+  background: var(--pink);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 10px;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  transition: width 800ms cubic-bezier(0.16, 1, 0.3, 1);
+  min-width: 36px;
+}
+.funnel-row:nth-child(1) .funnel-bar-fill { background: linear-gradient(90deg, var(--pink-deep), var(--pink)); }
+.funnel-row:nth-child(2) .funnel-bar-fill { background: linear-gradient(90deg, var(--pink), var(--pink-soft)); }
+.funnel-row:nth-child(3) .funnel-bar-fill { background: linear-gradient(90deg, var(--pink-soft), #ff80c2); }
+.funnel-row:nth-child(4) .funnel-bar-fill { background: linear-gradient(90deg, #ff80c2, var(--success)); }
+.funnel-row .fr-conv {
+  font-size: 10px;
+  color: var(--slate);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  min-width: 40px;
+  text-align: right;
+}
+
+/* =========================================================
+   ESTIMATOR
+   ========================================================= */
+.estimator-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+.est-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 14px;
+  align-items: end;
+}
+.est-input {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.est-input .ei-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--slate);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.est-input .ei-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.est-input.editable .ei-value {
+  color: var(--pink);
 }
 .rate-slider {
   -webkit-appearance: none;
@@ -508,342 +528,101 @@ body {
   height: 4px;
   background: var(--hairline);
   border-radius: 2px;
-  margin-top: 14px;
+  margin-top: 6px;
   outline: none;
 }
 .rate-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  background: var(--accent);
+  width: 16px;
+  height: 16px;
+  background: var(--pink);
   border-radius: 50%;
   cursor: pointer;
-  border: 3px solid var(--paper);
-  box-shadow: 0 0 0 1px var(--accent);
+  border: 3px solid var(--card);
+  box-shadow: 0 0 0 1px var(--pink);
 }
 .rate-slider::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  background: var(--accent);
+  width: 10px;
+  height: 10px;
+  background: var(--pink);
   border-radius: 50%;
   cursor: pointer;
-  border: 3px solid var(--paper);
-  box-shadow: 0 0 0 1px var(--accent);
+  border: 3px solid var(--card);
+  box-shadow: 0 0 0 1px var(--pink);
 }
 .est-output {
-  padding: 32px 0 0;
-  border-top: 1px solid var(--divider);
+  background: linear-gradient(135deg, var(--pink-pale) 0%, var(--pink-whisper) 100%);
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  text-align: right;
+  min-width: 140px;
 }
 .est-output .eo-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-bottom: 16px;
-}
-.est-output .eo-number {
-  font-family: 'Fraunces', serif;
-  font-size: clamp(56px, 8vw, 88px);
-  font-weight: 300;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  font-variant-numeric: tabular-nums;
-}
-.est-output.applications .eo-number { color: var(--accent); }
-.est-output.footfall .eo-number { color: var(--ink); }
-
-/* =========================================================
-   FUNNEL — visual flow
-   ========================================================= */
-.funnel {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
-  align-items: stretch;
-}
-@media (max-width: 768px) { .funnel { grid-template-columns: 1fr 1fr; } }
-.funnel-stage {
-  padding: 28px 24px;
-  background: var(--card);
-  border: 1px solid var(--hairline);
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 180px;
-}
-.funnel-stage:hover { border-color: var(--divider); transition: border-color 200ms ease; }
-.funnel-stage .step {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  font-weight: 500;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--pink-deep);
   letter-spacing: 0.1em;
-  color: var(--muted);
-}
-.funnel-stage .stage-label {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  color: var(--slate);
   text-transform: uppercase;
-  margin-top: 8px;
 }
-.funnel-stage .stage-num {
-  font-family: 'Fraunces', serif;
-  font-size: 48px;
-  font-weight: 300;
-  line-height: 1;
+.est-output .eo-num {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--pink-deep);
+  font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink);
-  margin: 16px 0 8px;
-}
-.funnel-stage .stage-conv {
-  font-size: 11px;
-  color: var(--slate);
-  letter-spacing: 0.02em;
-}
-.funnel-stage.accent .stage-num { color: var(--accent); }
-.funnel-stage.success .stage-num { color: var(--success); }
-
-.funnel-tail {
-  margin-top: 32px;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 24px;
-  padding: 32px;
-  background: var(--tint);
-  border-radius: 16px;
-}
-@media (max-width: 768px) { .funnel-tail { grid-template-columns: 1fr; gap: 16px; padding: 24px; } }
-.tail-cell .tc-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-bottom: 12px;
-}
-.tail-cell .tc-num {
-  font-family: 'Fraunces', serif;
-  font-size: 40px;
-  font-weight: 400;
   line-height: 1;
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-}
-.tail-cell.editable .tc-num {
-  color: var(--accent);
-  cursor: pointer;
-  border-bottom: 2px dashed var(--accent);
-  display: inline-block;
-  padding-bottom: 4px;
-}
-.tail-cell.success .tc-num { color: var(--success); }
-
-/* =========================================================
-   DAILY TREND — pure CSS bar chart, no libraries
-   ========================================================= */
-.trend-chart {
-  display: flex;
-  align-items: flex-end;
-  gap: 4px;
-  height: 240px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--hairline);
-  position: relative;
-}
-.trend-day {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  position: relative;
-  cursor: pointer;
-  min-width: 0;
-}
-.trend-bar-stack {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  height: 100%;
-  position: relative;
-}
-.trend-bar {
-  width: 100%;
-  background: var(--ink);
-  border-radius: 2px 2px 0 0;
-  transition: opacity 200ms ease, transform 200ms ease;
-  min-height: 0;
-}
-.trend-bar.ch { background: var(--accent); }
-.trend-bar.nch { background: var(--ink); border-radius: 2px 2px 0 0; }
-.trend-bar.ch:not(:first-child) { border-radius: 0; }
-.trend-day:hover .trend-bar { opacity: 0.7; }
-.trend-day:hover .trend-bar.ch, .trend-day:hover .trend-bar.nch { opacity: 1; transform: scaleX(1.4); }
-
-.trend-tooltip {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%) translateY(4px);
-  background: var(--ink);
-  color: var(--paper);
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 11px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: all 160ms ease;
-  z-index: 10;
-  box-shadow: var(--shadow-md);
-}
-.trend-tooltip::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 4px solid transparent;
-  border-top-color: var(--ink);
-}
-.trend-day:hover .trend-tooltip {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-.trend-tooltip .tt-date { font-weight: 600; letter-spacing: 0.04em; margin-bottom: 4px; }
-.trend-tooltip .tt-row { font-family: 'JetBrains Mono', monospace; font-size: 10px; opacity: 0.8; }
-
-.trend-axis {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 12px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: var(--muted);
+  margin-top: 2px;
 }
 
 /* =========================================================
-   PRIZE SPLIT — horizontal bars
+   DATA QUALITY ROW — 4 inline cards
    ========================================================= */
-.prize-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-.prize-row {
-  display: grid;
-  grid-template-columns: 200px 1fr 60px;
-  gap: 24px;
-  align-items: center;
-  padding: 16px 0;
-  border-bottom: 1px solid var(--hairline);
-}
-@media (max-width: 768px) {
-  .prize-row { grid-template-columns: 1fr 50px; }
-  .prize-row .prize-bar-track { display: none; }
-}
-.prize-row .prize-label {
-  font-size: 14px;
-  color: var(--ink);
-  font-weight: 400;
-}
-.prize-bar-track {
-  height: 6px;
-  background: var(--hairline);
-  border-radius: 3px;
-  position: relative;
-  overflow: hidden;
-}
-.prize-bar-fill {
-  height: 100%;
-  background: var(--ink);
-  border-radius: 3px;
-  width: 0;
-  transition: width 800ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-.prize-row.top .prize-bar-fill { background: var(--accent); }
-.prize-row.zero { opacity: 0.35; }
-.prize-count {
-  font-family: 'Fraunces', serif;
-  font-size: 22px;
-  font-weight: 400;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
-}
-
-/* =========================================================
-   DATA QUALITY — flagging issues
-   ========================================================= */
-.dq-grid {
+.dq-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
+  gap: 12px;
 }
-@media (max-width: 768px) { .dq-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 900px) { .dq-row { grid-template-columns: repeat(2, 1fr); } }
 .dq-cell {
-  padding: 24px;
-  background: var(--card);
-  border: 1px solid var(--hairline);
-  border-radius: 12px;
+  background: var(--card-tint);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 .dq-cell .dq-label {
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.12em;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-bottom: 12px;
+  color: var(--slate);
 }
 .dq-cell .dq-num {
-  font-family: 'Fraunces', serif;
-  font-size: 36px;
-  font-weight: 400;
-  line-height: 1;
-  letter-spacing: -0.02em;
+  font-size: 18px;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
-.dq-cell.has-issue .dq-num { color: var(--danger); }
+.dq-cell.issue { background: var(--danger-tint); }
+.dq-cell.issue .dq-num { color: var(--danger); }
+.dq-cell.issue .dq-label { color: var(--danger); }
 .dq-cell.clean .dq-num { color: var(--success); }
 
 /* =========================================================
-   FOOTER
-   ========================================================= */
-.foot {
-  margin-top: 96px;
-  padding-top: 32px;
-  border-top: 1px solid var(--hairline);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-  font-size: 11px;
-  color: var(--muted);
-  letter-spacing: 0.04em;
-}
-
-/* =========================================================
-   LOADING STATE
+   LOADING / ERROR STATES
    ========================================================= */
 .loading {
-  min-height: 80vh;
+  min-height: 70vh;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 .loading-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--pink);
   animation: pulse 1400ms ease-in-out infinite;
 }
 .loading-label {
@@ -853,68 +632,51 @@ body {
   color: var(--muted);
   text-transform: uppercase;
 }
-
-/* =========================================================
-   ERROR / EMPTY STATES
-   ========================================================= */
 .error-state {
-  padding: 32px;
+  margin: 32px;
+  padding: 28px;
   background: var(--danger-tint);
   border: 1px solid var(--danger);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   color: var(--danger);
-  font-size: 14px;
-  margin: 32px 0;
 }
 .error-state h3 {
-  font-family: 'Fraunces', serif;
-  font-size: 20px;
-  margin-bottom: 12px;
-  font-weight: 500;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
 }
 .error-state pre {
-  font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
   background: var(--card);
-  padding: 12px;
+  padding: 10px;
   border-radius: 6px;
-  margin-top: 12px;
+  margin-top: 10px;
   overflow-x: auto;
-  color: var(--graphite);
+  color: var(--ink-soft);
 }
 
 /* =========================================================
    ANIMATIONS
    ========================================================= */
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 @keyframes pulse {
   0%, 100% { opacity: 0.3; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.4); }
 }
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: slideUp 500ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.fade-in.d1 { animation-delay: 40ms; }
+.fade-in.d2 { animation-delay: 80ms; }
+.fade-in.d3 { animation-delay: 120ms; }
+.fade-in.d4 { animation-delay: 160ms; }
 
-.fade-in { animation: fadeIn 600ms cubic-bezier(0.16, 1, 0.3, 1) both; }
-
-/* =========================================================
-   PRINT
-   ========================================================= */
 @media print {
-  .toggle-row, .icon-btn { display: none !important; }
-  body { background: white !important; color: black !important; }
+  .icon-btn { display: none !important; }
+  body { background: white !important; }
+  .header-band { background: white !important; border-bottom: 2px solid var(--pink); }
 }
 </style>
 </head>
@@ -929,12 +691,11 @@ body {
 
 <script>
 // =============================================================
-// CONFIG — paste your Apps Script Web App URL here
+// CONFIG
 // =============================================================
 const CONFIG = {
-  // Replace this with your deployed Apps Script Web App URL (ends in /exec)
   API_URL: 'https://script.google.com/macros/s/AKfycbylwJ0xQryr7wCqjtlUeMRubvWPjx3pQgm0r6EO_BP_Fu2tjg_T7bkQ_cvB3oHqisuCnQ/exec?token=sv-7f3x9k2p-mall-of-emirates-2026-q5tj8w4n',
-  REFRESH_INTERVAL_MS: 5 * 60 * 1000   // auto-refresh every 5 minutes
+  REFRESH_INTERVAL_MS: 5 * 60 * 1000
 };
 
 // =============================================================
@@ -942,16 +703,10 @@ const CONFIG = {
 // =============================================================
 const state = {
   raw: null,
-  filters: {
-    mode: 'all',        // 'all' | 'today' | 'date'
-    date: null,         // YYYY-MM-DD string when mode='date'
-    location: 'all'     // 'all' | 'MoE' | 'DCC' | 'MCC'
-  },
-  rates: {
-    signup: 0.15,
-    lead: 0.30
-  },
-  theme: 'light'
+  filters: { mode: 'all', date: null, location: 'all' },
+  rates: { signup: 0.15, lead: 0.30 },
+  theme: 'light',
+  charts: {}
 };
 
 // =============================================================
@@ -963,20 +718,17 @@ const fmt = {
   date: iso => {
     if (!iso) return '';
     const d = new Date(iso + 'T00:00:00');
-    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
   },
-  shortDate: iso => {
+  fullDate: iso => {
     if (!iso) return '';
     const d = new Date(iso + 'T00:00:00');
-    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   },
   timestamp: iso => {
     if (!iso) return '';
     const d = new Date(iso);
-    return d.toLocaleString('en-GB', {
-      day: '2-digit', month: 'short', year: 'numeric',
-      hour: '2-digit', minute: '2-digit', hour12: false
-    });
+    return d.toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false });
   }
 };
 
@@ -984,88 +736,67 @@ function todayISO() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
-
-function daysBetween(startISO, endISO) {
-  const a = new Date(startISO + 'T00:00:00');
-  const b = new Date(endISO + 'T00:00:00');
-  return Math.round((b - a) / 86400000);
+function daysBetween(a, b) {
+  return Math.round((new Date(b + 'T00:00:00') - new Date(a + 'T00:00:00')) / 86400000);
 }
-
-function eachDate(startISO, endISO) {
+function eachDate(s, e) {
   const out = [];
-  let d = new Date(startISO + 'T00:00:00');
-  const end = new Date(endISO + 'T00:00:00');
+  let d = new Date(s + 'T00:00:00');
+  const end = new Date(e + 'T00:00:00');
   while (d <= end) {
     out.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
     d.setDate(d.getDate() + 1);
   }
   return out;
 }
+function dayOfWeek(iso) {
+  return new Date(iso + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short' });
+}
 
 // =============================================================
-// DATA TRANSFORM — apply filters
+// FILTER + COMPUTE
 // =============================================================
 function applyFilters(raw, filters) {
   if (!raw) return null;
-
   let activeDate = null;
   if (filters.mode === 'today') activeDate = todayISO();
   else if (filters.mode === 'date') activeDate = filters.date;
-
   const matchRow = r => {
     if (filters.location !== 'all' && r.location !== filters.location) return false;
     if (activeDate && r.date !== activeDate) return false;
     return true;
   };
-
   return {
     cardHolders: raw.cardHolders.filter(matchRow),
     nonCardHolders: raw.nonCardHolders.filter(matchRow),
-    activeDate,
-    dateFilterOn: !!activeDate,
-    locationFilterOn: filters.location !== 'all'
+    activeDate
   };
 }
 
-// =============================================================
-// COMPUTE METRICS from filtered data
-// =============================================================
 function computeMetrics(filtered) {
-  if (!filtered) return null;
   const ch = filtered.cardHolders;
   const nch = filtered.nonCardHolders;
-  const applied = nch.filter(r => r.applied === 'Y').length;
-  const voucher = nch.filter(r => r.voucher === 'Y').length;
-  const prizesCh = ch.filter(r => r.prize).length;
-  const prizesNch = nch.filter(r => r.prize).length;
   return {
     cardHolders: ch.length,
     nonCardHolders: nch.length,
     footfall: ch.length + nch.length,
-    applied: applied,
-    vouchers: voucher,
-    prizes: prizesCh + prizesNch
+    applied: nch.filter(r => r.applied === 'Y').length,
+    vouchers: nch.filter(r => r.voucher === 'Y').length,
+    prizes: ch.filter(r => r.prize).length + nch.filter(r => r.prize).length
   };
 }
 
-// =============================================================
-// LOCATION SPLIT — always all 3, respects date filter but not location
-// =============================================================
 function locationSplit(raw, filters) {
   const locs = ['MoE', 'DCC', 'MCC'];
   let activeDate = null;
   if (filters.mode === 'today') activeDate = todayISO();
   else if (filters.mode === 'date') activeDate = filters.date;
-
   return locs.map(loc => {
     const inLoc = r => r.location === loc && (!activeDate || r.date === activeDate);
     const ch = raw.cardHolders.filter(inLoc);
     const nch = raw.nonCardHolders.filter(inLoc);
     return {
       code: loc,
-      fullName: raw.period.locations[loc].fullName,
-      start: raw.period.locations[loc].start,
-      end: raw.period.locations[loc].end,
       cardHolders: ch.length,
       nonCardHolders: nch.length,
       total: ch.length + nch.length,
@@ -1075,41 +806,48 @@ function locationSplit(raw, filters) {
   });
 }
 
-// =============================================================
-// DAILY TIMELINE — always all days, ignores filters
-// =============================================================
 function dailyTimeline(raw) {
   const dates = eachDate(raw.period.start, raw.period.end);
+  let cumulative = 0;
   return dates.map(d => {
     const ch = raw.cardHolders.filter(r => r.date === d).length;
     const nch = raw.nonCardHolders.filter(r => r.date === d).length;
-    return { date: d, cardHolders: ch, nonCardHolders: nch, total: ch + nch };
+    cumulative += (ch + nch);
+    return { date: d, cardHolders: ch, nonCardHolders: nch, total: ch + nch, cumulative };
   });
 }
 
-// =============================================================
-// PRIZE SPLIT — respects filters
-// =============================================================
+function dayOfWeekSplit(raw) {
+  const days = { Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0, Sun: 0 };
+  const all = [...raw.cardHolders, ...raw.nonCardHolders];
+  all.forEach(r => {
+    if (r.date) {
+      const day = dayOfWeek(r.date);
+      if (days[day] !== undefined) days[day]++;
+    }
+  });
+  return Object.entries(days).map(([day, count]) => ({ day, count }));
+}
+
 function prizeSplit(filtered) {
   const categories = [
-    { label: 'Gold Coin (10g)',        pattern: /gold coin \(10g\)/i },
-    { label: 'Gold Coin (5g)',         pattern: /gold coin \(5g\)/i },
-    { label: 'AED 2,500 SHARE Points', pattern: /aed 2,500/i },
-    { label: 'AED 1,000 SHARE Points', pattern: /aed 1,000/i },
-    { label: 'AED 500 SHARE Points',   pattern: /aed 500/i },
-    { label: 'AED 250 SHARE Points',   pattern: /aed 250/i },
-    { label: 'AED 100 SHARE Points',   pattern: /aed 100/i },
-    { label: 'Carrefour Prizes',       pattern: /carrefour/i },
-    { label: 'Lululemon Voucher',      pattern: /lululemon/i },
-    { label: 'LEGO Set',               pattern: /lego/i },
-    { label: 'Psycho Bunny Voucher',   pattern: /psycho bunny/i },
-    { label: 'AllSaints Voucher',      pattern: /allsaints/i }
+    { label: 'Gold 10g',         pattern: /gold coin \(10g\)/i },
+    { label: 'Gold 5g',          pattern: /gold coin \(5g\)/i },
+    { label: 'AED 2,500 SP',     pattern: /aed 2,500/i },
+    { label: 'AED 1,000 SP',     pattern: /aed 1,000/i },
+    { label: 'AED 500 SP',       pattern: /aed 500/i },
+    { label: 'AED 250 SP',       pattern: /aed 250/i },
+    { label: 'AED 100 SP',       pattern: /aed 100/i },
+    { label: 'Carrefour',        pattern: /carrefour/i },
+    { label: 'Lululemon',        pattern: /lululemon/i },
+    { label: 'LEGO',             pattern: /lego/i },
+    { label: 'Psycho Bunny',     pattern: /psycho bunny/i },
+    { label: 'AllSaints',        pattern: /allsaints/i }
   ];
   const all = [
     ...filtered.cardHolders.map(r => r.prize),
     ...filtered.nonCardHolders.map(r => r.prize)
   ].filter(Boolean);
-
   return categories.map(c => ({
     label: c.label,
     count: all.filter(p => c.pattern.test(p)).length
@@ -1117,7 +855,7 @@ function prizeSplit(filtered) {
 }
 
 // =============================================================
-// RENDER — full dashboard HTML
+// RENDER — full dashboard skeleton
 // =============================================================
 function render() {
   const raw = state.raw;
@@ -1126,8 +864,6 @@ function render() {
   const filtered = applyFilters(raw, state.filters);
   const m = computeMetrics(filtered);
   const locs = locationSplit(raw, state.filters);
-  const daily = dailyTimeline(raw);
-  const prizes = prizeSplit(filtered);
 
   // Period progress
   const periodStart = raw.period.start;
@@ -1138,7 +874,7 @@ function render() {
   const periodPct = Math.max(0, Math.min(1, dayOfPeriod / totalDays));
   const daysRemaining = Math.max(0, daysBetween(today, periodEnd));
 
-  // Estimator math (always against unfiltered NCH data — projections need full population)
+  // Estimator math
   const allNch = raw.nonCardHolders.length;
   const daysSinceStart = Math.max(1, daysBetween(periodStart, today) + 1);
   const avgDailyNch = allNch / daysSinceStart;
@@ -1148,24 +884,8 @@ function render() {
   const avgDailyFootfall = totalFootfall / daysSinceStart;
   const projectedFootfall = Math.round(totalFootfall + (avgDailyFootfall * daysRemaining));
   const estCardsIssued = Math.round(totalApplied * state.rates.lead);
-  const remainingLeads = allNch - totalApplied;
-  const additionalCardsFromLeads = Math.round(remainingLeads * state.rates.lead);
 
-  // Date for date input min/max
-  const periodDates = eachDate(periodStart, periodEnd);
   const dq = raw.dataQuality;
-
-  // Filter labels for "Viewing" strip
-  const viewLabel = state.filters.mode === 'all' ? 'All-time cumulative' :
-                    state.filters.mode === 'today' ? `Today · ${fmt.date(today)}` :
-                    `Date · ${fmt.date(state.filters.date)}`;
-  const locLabel = state.filters.location === 'all' ? 'All locations' : state.filters.location;
-
-  // Compute prize bars max for scaling
-  const maxPrize = Math.max(1, ...prizes.map(p => p.count));
-
-  // Compute trend bars max for scaling
-  const maxDay = Math.max(1, ...daily.map(d => d.total));
 
   // SVG icons
   const SUN_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
@@ -1173,35 +893,27 @@ function render() {
   const REFRESH_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.41-6.36L23 10"/><path d="M23 4v6h-6"/><path d="M21 12a9 9 0 0 1-15.41 6.36L1 14"/><path d="M1 20v-6h6"/></svg>`;
 
   const html = `
-  <div class="shell">
-
-    <header class="top">
+  <!-- HEADER BAND with gradient -->
+  <header class="header-band">
+    <div class="header-row">
       <div class="brand-block">
-        <div class="title">SHARE Anniversary</div>
-        <div class="subtitle">Activation Performance Read-Out</div>
+        <div class="title-stack">
+          <div class="title"><span class="purple-word">SHARE</span> <span class="pink-word">Anniversary</span> Activation</div>
+          <div class="subtitle">Real-time performance read-out · Emirates NBD × Visa × Majid Al Futtaim</div>
+        </div>
       </div>
       <div class="meta-block">
         <div class="partners">ENBD · Visa · MAF</div>
-        <div class="timestamp">Live · ${fmt.timestamp(raw.generatedAt)}</div>
-        <div class="toggle-row">
-          <button class="icon-btn" id="refreshBtn" title="Refresh data">${REFRESH_ICON}</button>
-          <button class="icon-btn" id="themeBtn" title="Toggle theme">${state.theme === 'light' ? MOON_ICON : SUN_ICON}</button>
-        </div>
+        <div class="timestamp">Last refresh · ${fmt.timestamp(raw.generatedAt)}</div>
+        <button class="icon-btn" id="refreshBtn" title="Refresh">${REFRESH_ICON}</button>
+        <button class="icon-btn" id="themeBtn" title="Toggle theme">${state.theme === 'light' ? MOON_ICON : SUN_ICON}</button>
       </div>
-    </header>
-
-    <div class="period-strip">
-      <div class="period-text">Day ${dayOfPeriod} of ${totalDays}</div>
-      <div class="period-track">
-        <div class="period-fill" style="width: ${periodPct * 100}%"></div>
-        <div class="period-marker show" style="left: ${periodPct * 100}%"></div>
-      </div>
-      <div class="period-text" style="color: var(--muted)">${fmt.pct(periodPct)} complete</div>
     </div>
 
+    <!-- FILTER BAR -->
     <div class="filter-bar">
-      <div class="filter-group">
-        <span class="filter-label">View</span>
+      <div class="filter-pill">
+        <span class="label">View</span>
         <div class="segmented" id="modeSegment">
           <button class="${state.filters.mode === 'all' ? 'active' : ''}" data-mode="all">All-time</button>
           <button class="${state.filters.mode === 'today' ? 'active' : ''}" data-mode="today">Today</button>
@@ -1212,9 +924,8 @@ function render() {
           min="${periodStart}" max="${periodEnd}"
           ${state.filters.mode === 'date' ? '' : 'disabled'} />
       </div>
-
-      <div class="filter-group">
-        <span class="filter-label">Location</span>
+      <div class="filter-pill">
+        <span class="label">Location</span>
         <div class="segmented" id="locSegment">
           <button class="${state.filters.location === 'all' ? 'active' : ''}" data-loc="all">All</button>
           <button class="${state.filters.location === 'MoE' ? 'active' : ''}" data-loc="MoE">MoE</button>
@@ -1224,286 +935,439 @@ function render() {
       </div>
     </div>
 
-    <!-- HERO SECTION -->
-    <section class="section">
-      <div class="section-head">Viewing — ${viewLabel} · ${locLabel}</div>
-      <div class="hero">
-        <div class="hero-left">
-          <div class="hero-label">Total Footfall</div>
-          <div class="hero-number">${fmt.num(m.footfall)}</div>
-          <div class="hero-caption">${m.footfall === 0 ? 'No entries match current filters.' : `${m.footfall === 1 ? 'Customer' : 'Customers'} engaged during the activation window.`}</div>
+    <!-- PROGRESS STRIP -->
+    <div class="progress-strip">
+      <div class="text-left">Day ${dayOfPeriod} of ${totalDays}</div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width: ${periodPct * 100}%"></div>
+        <div class="progress-marker" style="left: ${periodPct * 100}%"></div>
+      </div>
+      <div class="text-right">${fmt.pct(periodPct)} · ${daysRemaining} days remaining</div>
+    </div>
+  </header>
+
+  <!-- MAIN BODY -->
+  <div class="main">
+    <div class="dashboard-grid">
+
+      <!-- KPI STRIP -->
+      <div class="kpi-strip fade-in">
+        <div class="kpi-card hero">
+          <div class="kpi-label">Total Footfall</div>
+          <div class="kpi-value">${fmt.num(m.footfall)}</div>
+          <div class="kpi-sub">${m.footfall ? `${fmt.pct(m.cardHolders / m.footfall)} card holders` : 'No entries match filters'}</div>
         </div>
-        <div class="hero-right">
-          <div class="hero-breakdown-row">
-            <div class="hbr-label">Card Holders</div>
-            <div class="hbr-num">${fmt.num(m.cardHolders)}</div>
-            <div class="hbr-pct">${m.footfall ? fmt.pct(m.cardHolders / m.footfall) : '—'}</div>
-          </div>
-          <div class="hero-breakdown-row">
-            <div class="hbr-label">Non-Cardholders</div>
-            <div class="hbr-num">${fmt.num(m.nonCardHolders)}</div>
-            <div class="hbr-pct">${m.footfall ? fmt.pct(m.nonCardHolders / m.footfall) : '—'}</div>
-          </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Card Holders</div>
+          <div class="kpi-value">${fmt.num(m.cardHolders)}</div>
+          <div class="kpi-sub">SHARE Visa verified</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Non-Cardholders</div>
+          <div class="kpi-value">${fmt.num(m.nonCardHolders)}</div>
+          <div class="kpi-sub">${m.applied ? `<span class="pct-pink">${fmt.pct(m.applied/Math.max(1,m.nonCardHolders))}</span> applied` : 'Eligible for sign-up'}</div>
+        </div>
+        <div class="kpi-card accent">
+          <div class="kpi-label">Applied for Card</div>
+          <div class="kpi-value">${fmt.num(m.applied)}</div>
+          <div class="kpi-sub">${m.nonCardHolders ? fmt.pct(m.applied/m.nonCardHolders) + ' conversion' : '—'}</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Vouchers Issued</div>
+          <div class="kpi-value">${fmt.num(m.vouchers)}</div>
+          <div class="kpi-sub">${m.applied ? fmt.pct(m.vouchers/Math.max(1,m.applied)) + ' issued vs applied' : 'No applications yet'}</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Prizes Given</div>
+          <div class="kpi-value">${fmt.num(m.prizes)}</div>
+          <div class="kpi-sub">${m.footfall ? fmt.pct(m.prizes/m.footfall) + ' of footfall' : '—'}</div>
         </div>
       </div>
-    </section>
 
-    <!-- PERFORMANCE -->
-    <section class="section">
-      <div class="section-head">Performance</div>
-      <div class="perf-grid">
-        <div class="perf-tile accent">
-          <div class="label">Applied for Card</div>
-          <div class="num">${fmt.num(m.applied)}</div>
-          <div class="hint">${m.nonCardHolders ? fmt.pct(m.applied / m.nonCardHolders) + ' of non-cardholders' : 'No non-cardholders'}</div>
+      <!-- DAILY TREND CHART -->
+      <div class="chart-card span-daily-trend fade-in d1">
+        <div class="section-head">
+          <span><span class="label-soft">Daily</span> Footfall Trend</span>
+          <span class="small-meta">CH + NCH stacked · 32 days</span>
         </div>
-        <div class="perf-tile">
-          <div class="label">Vouchers Issued</div>
-          <div class="num">${fmt.num(m.vouchers)}</div>
-          <div class="hint">${m.applied ? fmt.pct(m.vouchers / Math.max(1, m.applied)) + ' issued vs. applied' : 'No applications yet'}</div>
+        <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+      </div>
+
+      <!-- FUNNEL -->
+      <div class="chart-card span-funnel fade-in d1">
+        <div class="section-head">
+          <span><span class="label-soft">Acquisition</span> Funnel</span>
+          <span class="small-meta">Lead rate: <span style="color: var(--pink); font-weight: 700;" id="leadRateInline">${fmt.pct(state.rates.lead)}</span></span>
         </div>
-        <div class="perf-tile">
-          <div class="label">Prizes Given</div>
-          <div class="num">${fmt.num(m.prizes)}</div>
-          <div class="hint">${m.footfall ? fmt.pct(m.prizes / m.footfall) + ' of footfall' : '—'}</div>
+        <div class="funnel-vis" id="funnelVis"></div>
+        <div style="margin-top: 12px; display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--slate);">
+          <span style="min-width: 80px; font-weight: 600;">Lead rate</span>
+          <input type="range" class="rate-slider" id="leadSlider" min="0" max="100" value="${state.rates.lead*100}" step="1" style="flex: 1;" />
+          <span style="font-weight: 700; color: var(--pink); min-width: 40px; text-align: right;" id="leadRateLabel">${fmt.pct(state.rates.lead)}</span>
         </div>
       </div>
-    </section>
 
-    <!-- BY LOCATION -->
-    <section class="section">
-      <div class="section-head">By Location</div>
-      <table class="loc-table">
-        <thead>
-          <tr>
-            <th>Location</th>
-            <th>Card</th>
-            <th>Non-Card</th>
-            <th>Total</th>
-            <th>Applied</th>
-            <th>Vouchers</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${locs.map(l => {
-            const isLive = today >= l.start && today <= l.end;
-            const hasStarted = today >= l.start;
-            return `
-            <tr class="${hasStarted ? '' : 'inactive'}">
-              <td>
-                <strong>${l.code}</strong>
-                <span class="loc-full">${l.fullName}${!hasStarted ? ` · opens ${fmt.shortDate(l.start)}` : (isLive ? ' · live now' : ` · closed ${fmt.shortDate(l.end)}`)}</span>
-              </td>
-              <td>${fmt.num(l.cardHolders)}</td>
-              <td>${fmt.num(l.nonCardHolders)}</td>
-              <td class="total-col">${fmt.num(l.total)}</td>
-              <td>${fmt.num(l.applied)}</td>
-              <td>${fmt.num(l.vouchers)}</td>
-            </tr>`;
-          }).join('')}
-        </tbody>
-      </table>
-    </section>
-
-    <!-- SIGN-UP ESTIMATOR -->
-    <section class="section">
-      <div class="section-head">Sign-Up Estimator</div>
-      <div class="estimator">
-        <div class="est-side">
-          <div class="est-label">Projected Final Applications</div>
-          <div class="est-inputs">
-            <div class="est-input-cell">
-              <div class="ic-label">Avg Daily Non-CH</div>
-              <div class="ic-value">${Math.round(avgDailyNch).toLocaleString()}</div>
-            </div>
-            <div class="est-input-cell">
-              <div class="ic-label">Days Remaining</div>
-              <div class="ic-value">${daysRemaining}</div>
-            </div>
-            <div class="est-input-cell editable" data-rate="signup">
-              <div class="ic-label">Sign-up Rate · drag to adjust</div>
-              <div class="ic-value" id="signupRateLabel">${fmt.pct(state.rates.signup)}</div>
-              <input type="range" class="rate-slider" id="signupSlider" min="0" max="100" value="${state.rates.signup * 100}" step="1" />
-            </div>
-            <div class="est-input-cell">
-              <div class="ic-label">Already Applied</div>
-              <div class="ic-value">${fmt.num(totalApplied)}</div>
-            </div>
-          </div>
-          <div class="est-output applications">
-            <div class="eo-label">→ Projected Total Applications</div>
-            <div class="eo-number" id="projectedApps">${fmt.num(projectedApplications)}</div>
-          </div>
+      <!-- LOCATION COMPARISON -->
+      <div class="chart-card span-location fade-in d2">
+        <div class="section-head">
+          <span><span class="label-soft">By</span> Location</span>
+          <span class="small-meta">MoE · DCC · MCC</span>
         </div>
-        <div class="est-side">
-          <div class="est-label">Projected Final Footfall</div>
-          <div class="est-inputs">
-            <div class="est-input-cell">
-              <div class="ic-label">Avg Daily Footfall</div>
-              <div class="ic-value">${Math.round(avgDailyFootfall).toLocaleString()}</div>
-            </div>
-            <div class="est-input-cell">
-              <div class="ic-label">Days Remaining</div>
-              <div class="ic-value">${daysRemaining}</div>
-            </div>
-            <div class="est-input-cell">
-              <div class="ic-label">Current Total</div>
-              <div class="ic-value">${fmt.num(totalFootfall)}</div>
-            </div>
-            <div class="est-input-cell">
-              <div class="ic-label">Days Elapsed</div>
-              <div class="ic-value">${daysSinceStart}</div>
-            </div>
-          </div>
-          <div class="est-output footfall">
-            <div class="eo-label">→ Projected Total Footfall</div>
-            <div class="eo-number">${fmt.num(projectedFootfall)}</div>
-          </div>
-        </div>
+        <div class="chart-wrap"><canvas id="locationChart"></canvas></div>
       </div>
-    </section>
 
-    <!-- ACQUISITION FUNNEL -->
-    <section class="section">
-      <div class="section-head">Acquisition Funnel</div>
-      <div class="funnel">
-        <div class="funnel-stage">
-          <div class="step">01</div>
-          <div>
-            <div class="stage-num">${fmt.num(totalFootfall)}</div>
-            <div class="stage-label">Total Footfall</div>
-            <div class="stage-conv">entry point</div>
-          </div>
+      <!-- CUMULATIVE ACQUISITION -->
+      <div class="chart-card span-cumulative fade-in d2">
+        <div class="section-head">
+          <span><span class="label-soft">Cumulative</span> Acquisition</span>
+          <span class="small-meta">Actual + Forecast</span>
         </div>
-        <div class="funnel-stage">
-          <div class="step">02</div>
-          <div>
-            <div class="stage-num">${fmt.num(allNch)}</div>
-            <div class="stage-label">Non-Cardholders</div>
-            <div class="stage-conv">${totalFootfall ? fmt.pct(allNch / totalFootfall) : '—'} of footfall</div>
-          </div>
+        <div class="chart-wrap"><canvas id="cumulativeChart"></canvas></div>
+      </div>
+
+      <!-- DAY OF WEEK -->
+      <div class="chart-card span-dow fade-in d2">
+        <div class="section-head">
+          <span><span class="label-soft">Day of</span> Week Pattern</span>
+          <span class="small-meta">Footfall</span>
         </div>
-        <div class="funnel-stage accent">
-          <div class="step">03</div>
-          <div>
-            <div class="stage-num">${fmt.num(totalApplied)}</div>
-            <div class="stage-label">Applied</div>
-            <div class="stage-conv">${allNch ? fmt.pct(totalApplied / allNch) : '—'} of non-CH applied</div>
-          </div>
+        <div class="chart-wrap"><canvas id="dowChart"></canvas></div>
+      </div>
+
+      <!-- PRIZE SPLIT -->
+      <div class="chart-card span-prizes fade-in d3">
+        <div class="section-head">
+          <span><span class="label-soft">Prize</span> Distribution</span>
+          <span class="small-meta">Top categories</span>
         </div>
-        <div class="funnel-stage success">
-          <div class="step">04</div>
-          <div>
-            <div class="stage-num">${fmt.num(estCardsIssued)}</div>
-            <div class="stage-label">Est. Cards Issued</div>
-            <div class="stage-conv">at ${fmt.pct(state.rates.lead)} lead conversion</div>
+        <div class="chart-wrap"><canvas id="prizeChart"></canvas></div>
+      </div>
+
+      <!-- ESTIMATOR -->
+      <div class="chart-card span-estimator fade-in d3">
+        <div class="section-head">
+          <span><span class="label-soft">Sign-Up</span> Estimator</span>
+          <span class="small-meta">End-of-activation projection</span>
+        </div>
+        <div class="estimator-grid">
+          <div class="est-row">
+            <div class="est-input">
+              <div class="ei-label">Avg Daily Non-CH</div>
+              <div class="ei-value">${Math.round(avgDailyNch).toLocaleString()}</div>
+            </div>
+            <div class="est-input">
+              <div class="ei-label">Already Applied</div>
+              <div class="ei-value">${fmt.num(totalApplied)}</div>
+            </div>
+            <div class="est-input editable">
+              <div class="ei-label">Sign-up Rate</div>
+              <div class="ei-value" id="signupRateLabel">${fmt.pct(state.rates.signup)}</div>
+              <input type="range" class="rate-slider" id="signupSlider" min="0" max="100" value="${state.rates.signup*100}" step="1" />
+            </div>
+            <div class="est-output">
+              <div class="eo-label">Projected Apps</div>
+              <div class="eo-num" id="projectedApps">${fmt.num(projectedApplications)}</div>
+            </div>
+          </div>
+          <div class="est-row">
+            <div class="est-input">
+              <div class="ei-label">Avg Daily Footfall</div>
+              <div class="ei-value">${Math.round(avgDailyFootfall).toLocaleString()}</div>
+            </div>
+            <div class="est-input">
+              <div class="ei-label">Current Total</div>
+              <div class="ei-value">${fmt.num(totalFootfall)}</div>
+            </div>
+            <div class="est-input">
+              <div class="ei-label">Days Remaining</div>
+              <div class="ei-value">${daysRemaining}</div>
+            </div>
+            <div class="est-output">
+              <div class="eo-label">Projected Footfall</div>
+              <div class="eo-num" id="projectedFoot">${fmt.num(projectedFootfall)}</div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="funnel-tail">
-        <div class="tail-cell">
-          <div class="tc-label">Remaining Leads</div>
-          <div class="tc-num">${fmt.num(remainingLeads)}</div>
+      <!-- DATA QUALITY -->
+      <div class="chart-card span-dq fade-in d4">
+        <div class="section-head">
+          <span><span class="label-soft">Data</span> Quality</span>
+          <span class="small-meta">Issues in source tracker</span>
         </div>
-        <div class="tail-cell editable">
-          <div class="tc-label">Lead-to-Card Rate · drag</div>
-          <div class="tc-num" id="leadRateLabel">${fmt.pct(state.rates.lead)}</div>
-          <input type="range" class="rate-slider" id="leadSlider" min="0" max="100" value="${state.rates.lead * 100}" step="1" />
-        </div>
-        <div class="tail-cell success">
-          <div class="tc-label">Additional Cards Potential</div>
-          <div class="tc-num">${fmt.num(additionalCardsFromLeads)}</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- DAILY TREND -->
-    <section class="section">
-      <div class="section-head">Daily Trend</div>
-      <div class="trend-chart">
-        ${daily.map((d, i) => {
-          const isPast = d.date <= today;
-          const pinkPct = maxDay ? (d.cardHolders / maxDay) * 100 : 0;
-          const inkPct = maxDay ? (d.nonCardHolders / maxDay) * 100 : 0;
-          return `
-            <div class="trend-day">
-              <div class="trend-tooltip">
-                <div class="tt-date">${fmt.date(d.date)}</div>
-                <div class="tt-row">CH ${fmt.num(d.cardHolders)} · NCH ${fmt.num(d.nonCardHolders)}</div>
-                <div class="tt-row">Total ${fmt.num(d.total)}</div>
-              </div>
-              <div class="trend-bar-stack">
-                ${inkPct > 0 ? `<div class="trend-bar nch" style="height: ${inkPct}%; opacity: ${isPast ? 1 : 0.2}"></div>` : ''}
-                ${pinkPct > 0 ? `<div class="trend-bar ch" style="height: ${pinkPct}%; opacity: ${isPast ? 1 : 0.2}"></div>` : ''}
-              </div>
-            </div>
-          `;
-        }).join('')}
-      </div>
-      <div class="trend-axis">
-        <span>${fmt.shortDate(daily[0].date)}</span>
-        <span>${fmt.shortDate(daily[Math.floor(daily.length / 2)].date)}</span>
-        <span>${fmt.shortDate(daily[daily.length - 1].date)}</span>
-      </div>
-    </section>
-
-    <!-- PRIZE SPLIT -->
-    <section class="section">
-      <div class="section-head">Prize Split</div>
-      <div class="prize-list">
-        ${prizes.map((p, i) => `
-          <div class="prize-row ${i < 3 && p.count > 0 ? 'top' : ''} ${p.count === 0 ? 'zero' : ''}">
-            <div class="prize-label">${p.label}</div>
-            <div class="prize-bar-track">
-              <div class="prize-bar-fill" style="width: ${(p.count / maxPrize) * 100}%"></div>
-            </div>
-            <div class="prize-count">${fmt.num(p.count)}</div>
+        <div class="dq-row">
+          <div class="dq-cell ${dq.missingLocation > 0 ? 'issue' : 'clean'}">
+            <span class="dq-label">Missing location</span>
+            <span class="dq-num">${fmt.num(dq.missingLocation)}</span>
           </div>
-        `).join('')}
-      </div>
-    </section>
-
-    <!-- DATA QUALITY -->
-    <section class="section">
-      <div class="section-head">Data Quality</div>
-      <div class="dq-grid">
-        <div class="dq-cell ${dq.missingLocation > 0 ? 'has-issue' : 'clean'}">
-          <div class="dq-label">Missing Location</div>
-          <div class="dq-num">${fmt.num(dq.missingLocation)}</div>
-        </div>
-        <div class="dq-cell ${dq.missingDate > 0 ? 'has-issue' : 'clean'}">
-          <div class="dq-label">Missing Date</div>
-          <div class="dq-num">${fmt.num(dq.missingDate)}</div>
-        </div>
-        <div class="dq-cell ${dq.locationTypos > 0 ? 'has-issue' : 'clean'}">
-          <div class="dq-label">Location Typos</div>
-          <div class="dq-num">${fmt.num(dq.locationTypos)}</div>
-        </div>
-        <div class="dq-cell ${dq.duplicates > 0 ? 'has-issue' : 'clean'}">
-          <div class="dq-label">Duplicates Flagged</div>
-          <div class="dq-num">${fmt.num(dq.duplicates)}</div>
+          <div class="dq-cell ${dq.missingDate > 0 ? 'issue' : 'clean'}">
+            <span class="dq-label">Missing date</span>
+            <span class="dq-num">${fmt.num(dq.missingDate)}</span>
+          </div>
+          <div class="dq-cell ${dq.locationTypos > 0 ? 'issue' : 'clean'}">
+            <span class="dq-label">Location typos</span>
+            <span class="dq-num">${fmt.num(dq.locationTypos)}</span>
+          </div>
+          <div class="dq-cell ${dq.duplicates > 0 ? 'issue' : 'clean'}">
+            <span class="dq-label">Duplicates flagged</span>
+            <span class="dq-num">${fmt.num(dq.duplicates)}</span>
+          </div>
         </div>
       </div>
-    </section>
 
-    <footer class="foot">
-      <div>Emirates NBD SHARE Visa Credit Card · Anniversary Activation</div>
-      <div>15 May – 15 June 2026</div>
-    </footer>
-
+    </div>
   </div>
   `;
 
   document.getElementById('root').innerHTML = html;
+
+  // Render funnel
+  renderFunnel(totalFootfall, allNch, totalApplied, estCardsIssued);
+
+  // Render charts
+  setTimeout(() => {
+    renderCharts(raw, filtered, locs);
+  }, 60); // small delay to let layout settle
+
   attachHandlers();
 }
 
 // =============================================================
-// EVENT HANDLERS
+// FUNNEL VISUAL
+// =============================================================
+function renderFunnel(footfall, nch, applied, issued) {
+  const max = Math.max(1, footfall);
+  const stages = [
+    { label: 'Footfall', val: footfall, prev: footfall },
+    { label: 'Non-CH', val: nch, prev: footfall },
+    { label: 'Applied', val: applied, prev: nch },
+    { label: 'Issued (est)', val: issued, prev: applied }
+  ];
+  document.getElementById('funnelVis').innerHTML = stages.map(s => {
+    const pct = (s.val / max) * 100;
+    const conv = s.prev ? Math.round((s.val / s.prev) * 100) : 0;
+    return `
+      <div class="funnel-row">
+        <div class="fr-label">${s.label}</div>
+        <div class="funnel-bar-track">
+          <div class="funnel-bar-fill" style="width: ${Math.max(8, pct)}%">${fmt.num(s.val)}</div>
+        </div>
+        <div class="fr-conv">${conv}%</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// =============================================================
+// CHARTS — Chart.js
+// =============================================================
+function destroyChart(key) {
+  if (state.charts[key]) {
+    state.charts[key].destroy();
+    delete state.charts[key];
+  }
+}
+
+function chartColors() {
+  const isDark = state.theme === 'dark';
+  return {
+    pink: '#e6007e',
+    pinkSoft: '#ff4ba8',
+    pinkPale: isDark ? 'rgba(230,0,126,0.25)' : 'rgba(230,0,126,0.12)',
+    ink: isDark ? '#f5f5f5' : '#1a1a1a',
+    inkSoft: isDark ? 'rgba(245,245,245,0.4)' : 'rgba(26,26,26,0.4)',
+    grid: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
+    muted: isDark ? '#a1a1a1' : '#9a9a9a'
+  };
+}
+
+function commonOpts() {
+  const c = chartColors();
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 600, easing: 'easeOutCubic' },
+    plugins: {
+      legend: {
+        labels: { color: c.muted, font: { family: 'Poppins', size: 10, weight: '500' }, boxWidth: 10, boxHeight: 10, padding: 12 }
+      },
+      tooltip: {
+        backgroundColor: c.ink,
+        titleColor: 'white',
+        bodyColor: 'rgba(255,255,255,0.85)',
+        padding: 10,
+        cornerRadius: 8,
+        titleFont: { family: 'Poppins', size: 11, weight: '600' },
+        bodyFont: { family: 'Poppins', size: 11 },
+        displayColors: true,
+        boxPadding: 4
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: c.grid, drawBorder: false },
+        ticks: { color: c.muted, font: { family: 'Poppins', size: 9 }, maxRotation: 0 }
+      },
+      y: {
+        grid: { color: c.grid, drawBorder: false },
+        ticks: { color: c.muted, font: { family: 'Poppins', size: 9 } },
+        beginAtZero: true
+      }
+    }
+  };
+}
+
+function renderCharts(raw, filtered, locs) {
+  const c = chartColors();
+  const daily = dailyTimeline(raw);
+  const dow = dayOfWeekSplit(raw);
+  const prizes = prizeSplit(filtered);
+  const today = todayISO();
+  const todayIdx = daily.findIndex(d => d.date === today);
+  const periodStart = raw.period.start;
+  const periodEnd = raw.period.end;
+
+  // 1. DAILY TREND — stacked bar
+  destroyChart('trend');
+  state.charts.trend = new Chart(document.getElementById('trendChart'), {
+    type: 'bar',
+    data: {
+      labels: daily.map(d => fmt.date(d.date)),
+      datasets: [
+        {
+          label: 'Card Holders',
+          data: daily.map(d => d.cardHolders),
+          backgroundColor: c.pink,
+          borderRadius: { topLeft: 4, topRight: 4 },
+          stack: 'a',
+          maxBarThickness: 24
+        },
+        {
+          label: 'Non-Cardholders',
+          data: daily.map(d => d.nonCardHolders),
+          backgroundColor: c.ink,
+          borderRadius: 0,
+          stack: 'a',
+          maxBarThickness: 24
+        }
+      ]
+    },
+    options: {
+      ...commonOpts(),
+      scales: {
+        x: { ...commonOpts().scales.x, stacked: true },
+        y: { ...commonOpts().scales.y, stacked: true }
+      }
+    }
+  });
+
+  // 2. LOCATION — grouped bar
+  destroyChart('location');
+  state.charts.location = new Chart(document.getElementById('locationChart'), {
+    type: 'bar',
+    data: {
+      labels: locs.map(l => l.code),
+      datasets: [
+        { label: 'Card Holders', data: locs.map(l => l.cardHolders), backgroundColor: c.pink, borderRadius: 6, maxBarThickness: 32 },
+        { label: 'Non-Cardholders', data: locs.map(l => l.nonCardHolders), backgroundColor: c.ink, borderRadius: 6, maxBarThickness: 32 },
+        { label: 'Applied', data: locs.map(l => l.applied), backgroundColor: c.pinkSoft, borderRadius: 6, maxBarThickness: 32 }
+      ]
+    },
+    options: commonOpts()
+  });
+
+  // 3. CUMULATIVE — line chart with forecast
+  destroyChart('cumulative');
+  const cumActual = daily.map((d, i) => i <= todayIdx ? d.cumulative : null);
+  // Forecast from today to end based on current daily avg
+  const daysElapsed = Math.max(1, todayIdx + 1);
+  const currentCum = todayIdx >= 0 ? daily[todayIdx].cumulative : 0;
+  const dailyAvg = currentCum / daysElapsed;
+  const cumForecast = daily.map((d, i) => {
+    if (i < todayIdx) return null;
+    if (i === todayIdx) return currentCum;
+    const extraDays = i - todayIdx;
+    return Math.round(currentCum + (dailyAvg * extraDays));
+  });
+  state.charts.cumulative = new Chart(document.getElementById('cumulativeChart'), {
+    type: 'line',
+    data: {
+      labels: daily.map(d => fmt.date(d.date)),
+      datasets: [
+        {
+          label: 'Actual',
+          data: cumActual,
+          borderColor: c.pink,
+          backgroundColor: c.pinkPale,
+          borderWidth: 2.5,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          pointHoverBackgroundColor: c.pink,
+          tension: 0.3,
+          fill: true
+        },
+        {
+          label: 'Forecast',
+          data: cumForecast,
+          borderColor: c.pink,
+          borderWidth: 1.5,
+          borderDash: [4, 4],
+          pointRadius: 0,
+          tension: 0.3,
+          fill: false
+        }
+      ]
+    },
+    options: commonOpts()
+  });
+
+  // 4. DAY OF WEEK
+  destroyChart('dow');
+  state.charts.dow = new Chart(document.getElementById('dowChart'), {
+    type: 'bar',
+    data: {
+      labels: dow.map(d => d.day),
+      datasets: [{
+        label: 'Footfall',
+        data: dow.map(d => d.count),
+        backgroundColor: c.pink,
+        borderRadius: 6,
+        maxBarThickness: 22
+      }]
+    },
+    options: {
+      ...commonOpts(),
+      plugins: { ...commonOpts().plugins, legend: { display: false } }
+    }
+  });
+
+  // 5. PRIZES — horizontal bar
+  destroyChart('prizes');
+  const topPrizes = prizes.slice(0, 8);
+  state.charts.prizes = new Chart(document.getElementById('prizeChart'), {
+    type: 'bar',
+    data: {
+      labels: topPrizes.map(p => p.label),
+      datasets: [{
+        label: 'Awarded',
+        data: topPrizes.map(p => p.count),
+        backgroundColor: topPrizes.map((_, i) => i < 3 ? c.pink : i < 6 ? c.pinkSoft : c.ink),
+        borderRadius: 6
+      }]
+    },
+    options: {
+      ...commonOpts(),
+      indexAxis: 'y',
+      plugins: { ...commonOpts().plugins, legend: { display: false } }
+    }
+  });
+}
+
+// =============================================================
+// HANDLERS
 // =============================================================
 function attachHandlers() {
-  // Theme toggle
   document.getElementById('themeBtn').addEventListener('click', () => {
     state.theme = state.theme === 'light' ? 'dark' : 'light';
     document.body.setAttribute('data-theme', state.theme);
@@ -1511,16 +1375,14 @@ function attachHandlers() {
     render();
   });
 
-  // Refresh
   document.getElementById('refreshBtn').addEventListener('click', () => {
     const btn = document.getElementById('refreshBtn');
     btn.classList.add('spinning');
     fetchData().finally(() => {
-      setTimeout(() => btn.classList.remove('spinning'), 400);
+      setTimeout(() => btn.classList.remove('spinning'), 500);
     });
   });
 
-  // View mode segment
   document.getElementById('modeSegment').querySelectorAll('button').forEach(b => {
     b.addEventListener('click', () => {
       state.filters.mode = b.dataset.mode;
@@ -1531,7 +1393,6 @@ function attachHandlers() {
     });
   });
 
-  // Location segment
   document.getElementById('locSegment').querySelectorAll('button').forEach(b => {
     b.addEventListener('click', () => {
       state.filters.location = b.dataset.loc;
@@ -1539,39 +1400,34 @@ function attachHandlers() {
     });
   });
 
-  // Date input
   document.getElementById('dateInput').addEventListener('change', e => {
     state.filters.date = e.target.value;
     if (state.filters.mode !== 'date') state.filters.mode = 'date';
     render();
   });
 
-  // Signup rate slider
+  // Sliders
   const signupSlider = document.getElementById('signupSlider');
   if (signupSlider) {
     signupSlider.addEventListener('input', e => {
       state.rates.signup = parseInt(e.target.value) / 100;
       document.getElementById('signupRateLabel').textContent = fmt.pct(state.rates.signup);
-      // recompute projected apps without full re-render for smoothness
       updateProjections();
     });
-    signupSlider.addEventListener('change', () => render());
   }
-
-  // Lead rate slider
   const leadSlider = document.getElementById('leadSlider');
   if (leadSlider) {
     leadSlider.addEventListener('input', e => {
       state.rates.lead = parseInt(e.target.value) / 100;
       document.getElementById('leadRateLabel').textContent = fmt.pct(state.rates.lead);
+      const inlineEl = document.getElementById('leadRateInline');
+      if (inlineEl) inlineEl.textContent = fmt.pct(state.rates.lead);
       updateProjections();
     });
-    leadSlider.addEventListener('change', () => render());
   }
 }
 
 function updateProjections() {
-  // Lightweight live update during slider drag
   const raw = state.raw;
   if (!raw) return;
   const periodStart = raw.period.start;
@@ -1582,9 +1438,15 @@ function updateProjections() {
   const allNch = raw.nonCardHolders.length;
   const avgDailyNch = allNch / daysSinceStart;
   const totalApplied = raw.nonCardHolders.filter(r => r.applied === 'Y').length;
-  const projected = Math.round(totalApplied + (avgDailyNch * daysRemaining * state.rates.signup));
-  const el = document.getElementById('projectedApps');
-  if (el) el.textContent = fmt.num(projected);
+  const proj = Math.round(totalApplied + (avgDailyNch * daysRemaining * state.rates.signup));
+  const estIssued = Math.round(totalApplied * state.rates.lead);
+
+  const projEl = document.getElementById('projectedApps');
+  if (projEl) projEl.textContent = fmt.num(proj);
+
+  // Re-render funnel with new lead rate
+  const totalFootfall = raw.cardHolders.length + allNch;
+  renderFunnel(totalFootfall, allNch, totalApplied, estIssued);
 }
 
 // =============================================================
@@ -1602,12 +1464,10 @@ async function fetchData() {
     render();
   } catch (err) {
     document.getElementById('root').innerHTML = `
-      <div class="shell">
-        <div class="error-state">
-          <h3>Couldn't load dashboard data</h3>
-          <div>${err.message}</div>
-          <pre>${err.stack || ''}</pre>
-        </div>
+      <div class="error-state">
+        <h3>Couldn't load dashboard data</h3>
+        <div>${err.message}</div>
+        <pre>${err.stack || ''}</pre>
       </div>
     `;
   }
@@ -1624,7 +1484,6 @@ if (savedTheme) {
 
 fetchData();
 setInterval(fetchData, CONFIG.REFRESH_INTERVAL_MS);
-
 </script>
 </body>
 </html>
