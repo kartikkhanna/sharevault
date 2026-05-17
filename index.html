@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="theme-color" content="#fafafa" />
-<title>SHARE Anniversary — Activation Dashboard</title>
+<title>The Vault</title>
 
 <!-- Typography: Poppins (matches SHARE MAF dashboard aesthetic) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -960,7 +960,7 @@ function render() {
         <div class="kpi-card">
           <div class="kpi-label">Card Holders</div>
           <div class="kpi-value">${fmt.num(m.cardHolders)}</div>
-          <div class="kpi-sub">SHARE Visa verified</div>
+          <div class="kpi-sub"></div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Non-Cardholders</div>
@@ -973,7 +973,7 @@ function render() {
           <div class="kpi-sub">${m.nonCardHolders ? fmt.pct(m.applied/m.nonCardHolders) + ' conversion' : '—'}</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Vouchers Issued</div>
+          <div class="kpi-label">Gift Cards Issued</div>
           <div class="kpi-value">${fmt.num(m.vouchers)}</div>
           <div class="kpi-sub">${m.applied ? fmt.pct(m.vouchers/Math.max(1,m.applied)) + ' issued vs applied' : 'No applications yet'}</div>
         </div>
