@@ -1020,7 +1020,7 @@ function render() {
       <!-- KPI STRIP -->
       <div class="kpi-strip fade-in">
         <div class="kpi-card hero">
-          <div class="kpi-label">Total Footfall</div>
+          <div class="kpi-label">Total Footfall <span style="opacity:0.7;font-size:9px;letter-spacing:0.3px;">· UNIQUE</span></div>
           <div class="kpi-value">${fmt.num(m.footfall)}</div>
           <div class="kpi-sub">${m.footfall ? `${fmt.pct(m.cardHolders / m.footfall)} card holders` : 'No entries match filters'}</div>
         </div>
@@ -1181,9 +1181,9 @@ function render() {
             <span class="dq-label">Location typos</span>
             <span class="dq-num">${fmt.num(dq.locationTypos)}</span>
           </div>
-          <div class="dq-cell ${dq.duplicates > 0 ? 'issue' : 'clean'}">
-            <span class="dq-label">Duplicates flagged</span>
-            <span class="dq-num">${fmt.num(dq.duplicates)}</span>
+         <div class="dq-cell ${(dq.duplicatesRemoved || 0) > 0 ? 'issue' : 'clean'}">
+            <span class="dq-label">Duplicates removed</span>
+            <span class="dq-num">${fmt.num(dq.duplicatesRemoved || 0)}</span>
           </div>
         </div>
       </div>
@@ -1522,6 +1522,95 @@ function updateProjections() {
 }
 
 // =============================================================
+// DEDUPE — strict (mobile AND email both match), keep FIRST
+// =============================================================
+function normalizeMobile(m) {
+  if (!m) return '';
+  const digits = String(m).replace(/\D/g, '');
+  if (!digits) return '';
+  return digits.length > 9 ? digits.slice(-9) : digits;
+}
+
+function normalizeEmail(e) {
+  if (!e) return '';
+  return String(e).trim().toLowerCase();
+}
+
+function dedupeRows(rows) {
+  // Sort by date ascending (stable) so the FIRST occurrence is kept.
+  // Rows with no date sort to the end (won't displace dated rows from "first").
+  const sorted = [...rows].sort((a, b) => {
+    const da = a.date || '9999-99-99';
+    const db = b.date || '9999-99-99';
+    return da.localeCompare(db);
+  });
+
+  const seen = new Map(); // key → index in `out`
+  const out = [];
+
+  for (const r of sorted) {
+    const mob = normalizeMobile(r.mobile);
+    const em = normalizeEmail(r.email);
+    const key = (mob && em) ? (mob + '|' + em) : null;
+
+    if (!key) {
+      // Can't reliably dedupe — keep as-is, no dup count
+      out.push({ ...r, _dupes: 0 });
+      continue;
+    }
+
+    if (!seen.has(key)) {
+      // First time seeing this person — keep their row
+      seen.set(key, out.length);
+      out.push({ ...r, _dupes: 0 });
+    } else {
+      // Duplicate — consolidate onto the kept row
+      const idx = seen.get(key);
+      const kept = out[idx];
+      kept._dupes = (kept._dupes || 0) + 1;
+
+      // Sum raffle entries
+      const keptRaffle = Number(kept.raffle) || 0;
+      const dupRaffle = Number(r.raffle) || 0;
+      kept.raffle = keptRaffle + dupRaffle;
+
+      // Carry over prize if kept row is empty
+      if (!kept.prize && r.prize) kept.prize = r.prize;
+
+      // Carry over comment if kept row is empty (NCH only)
+      if (!kept.comment && r.comment) kept.comment = r.comment;
+
+      // Carry over voucher / applied flags if kept is empty but dup is Y
+      if (kept.applied !== 'Y' && r.applied === 'Y') kept.applied = 'Y';
+      if (kept.voucher !== 'Y' && r.voucher === 'Y') kept.voucher = 'Y';
+      if (kept.verified !== 'Y' && r.verified === 'Y') kept.verified = 'Y';
+    }
+  }
+  return out;
+}
+
+function dedupeSourceData(raw) {
+  const chDedup = dedupeRows(raw.cardHolders || []);
+  const nchDedup = dedupeRows(raw.nonCardHolders || []);
+
+  // Count duplicates removed (for Data Quality strip)
+  const chDupes = chDedup.reduce((sum, r) => sum + (r._dupes || 0), 0);
+  const nchDupes = nchDedup.reduce((sum, r) => sum + (r._dupes || 0), 0);
+
+  return {
+    ...raw,
+    cardHolders: chDedup,
+    nonCardHolders: nchDedup,
+    dataQuality: {
+      ...(raw.dataQuality || {}),
+      duplicatesRemoved: chDupes + nchDupes,
+      duplicatesCh: chDupes,
+      duplicatesNch: nchDupes
+    }
+  };
+}
+
+// =============================================================
 // FETCH
 // =============================================================
 async function fetchData() {
@@ -1532,18 +1621,9 @@ async function fetchData() {
     const res = await fetch(CONFIG.API_URL);
     const data = await res.json();
     if (data.error) throw new Error(data.error);
-    state.raw = data;
+    state.raw = dedupeSourceData(data);
     render();
   } catch (err) {
-    document.getElementById('root').innerHTML = `
-      <div class="error-state">
-        <h3>Couldn't load dashboard data</h3>
-        <div>${err.message}</div>
-        <pre>${err.stack || ''}</pre>
-      </div>
-    `;
-  }
-}
 
 // =============================================================
 // INIT
