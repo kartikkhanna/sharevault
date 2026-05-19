@@ -382,6 +382,15 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
   font-variant-numeric: tabular-nums;
 }
 .kpi-card.accent .kpi-value { color: var(--pink); }
+.kpi-card.unique-people {
+  background: linear-gradient(180deg, #fff5fa 0%, #ffffff 100%);
+  border-color: #f5c8de;
+}
+body.dark .kpi-card.unique-people {
+  background: linear-gradient(180deg, rgba(230,0,126,0.08) 0%, rgba(255,255,255,0.02) 100%);
+  border-color: rgba(230,0,126,0.3);
+}
+.kpi-card.unique-people .kpi-value { color: var(--ink); }
 .kpi-card .kpi-sub {
   font-size: 11px;
   color: var(--slate);
@@ -784,16 +793,63 @@ function applyFilters(raw, filters) {
   };
 }
 
+// =============================================================
+// DEDUPE — strict (mobile AND email both match)
+// =============================================================
+function normalizeMobile(m) {
+  if (!m) return '';
+  const digits = String(m).replace(/\D/g, '');
+  if (!digits) return '';
+  // Drop UAE country code 971 if present — keep last 9 digits
+  return digits.length > 9 ? digits.slice(-9) : digits;
+}
+
+function normalizeEmail(e) {
+  if (!e) return '';
+  return String(e).trim().toLowerCase();
+}
+
+function uniquePeopleCount(rows) {
+  // Strict: same person only if both mobile AND email match.
+  // Rows missing either field count as individual people (no merge possible).
+  const seen = new Set();
+  let unmatched = 0;
+  for (const r of rows) {
+    const mob = normalizeMobile(r.mobile);
+    const em = normalizeEmail(r.email);
+    if (!mob || !em) {
+      unmatched++;
+      continue;
+    }
+    seen.add(mob + '|' + em);
+  }
+  return seen.size + unmatched;
+}
+
+function uniquePeopleCombined(rowsA, rowsB) {
+  // Used for "Total Unique People" across CH + NCH.
+  // Same strict rule applied across the union.
+  return uniquePeopleCount([...rowsA, ...rowsB]);
+}
+
 function computeMetrics(filtered) {
   const ch = filtered.cardHolders;
   const nch = filtered.nonCardHolders;
+  const uniqueCh = uniquePeopleCount(ch);
+  const uniqueNch = uniquePeopleCount(nch);
+  const uniqueTotal = uniquePeopleCombined(ch, nch);
+  const totalRaw = ch.length + nch.length;
   return {
     cardHolders: ch.length,
     nonCardHolders: nch.length,
-    footfall: ch.length + nch.length,
+    footfall: totalRaw,
     applied: nch.filter(r => r.applied === 'Y').length,
     vouchers: nch.filter(r => r.voucher === 'Y').length,
-    prizes: ch.filter(r => r.prize).length + nch.filter(r => r.prize).length
+    prizes: ch.filter(r => r.prize).length + nch.filter(r => r.prize).length,
+    uniqueCh,
+    uniqueNch,
+    uniquePeople: uniqueTotal,
+    repeatRate: totalRaw > 0 ? (totalRaw - uniqueTotal) / totalRaw : 0
   };
 }
 
@@ -968,15 +1024,20 @@ function render() {
           <div class="kpi-value">${fmt.num(m.footfall)}</div>
           <div class="kpi-sub">${m.footfall ? `${fmt.pct(m.cardHolders / m.footfall)} card holders` : 'No entries match filters'}</div>
         </div>
+        <div class="kpi-card unique-people">
+          <div class="kpi-label">Unique People</div>
+          <div class="kpi-value">${fmt.num(m.uniquePeople)}</div>
+          <div class="kpi-sub">${m.footfall ? `<span class="pct-pink">${fmt.pct(m.repeatRate)}</span> repeat play rate` : 'Deduped: mobile + email'}</div>
+        </div>
         <div class="kpi-card">
           <div class="kpi-label">Card Holders</div>
           <div class="kpi-value">${fmt.num(m.cardHolders)}</div>
-          <div class="kpi-sub"></div>
+          <div class="kpi-sub">${m.cardHolders ? `${fmt.num(m.uniqueCh)} unique` : 'SHARE Visa verified'}</div>
         </div>
-        <div class="kpi-card">
+      <div class="kpi-card">
           <div class="kpi-label">Non-Cardholders</div>
           <div class="kpi-value">${fmt.num(m.nonCardHolders)}</div>
-          <div class="kpi-sub">${m.applied ? `<span class="pct-pink">${fmt.pct(m.applied/Math.max(1,m.nonCardHolders))}</span> applied` : 'Eligible for sign-up'}</div>
+          <div class="kpi-sub">${m.applied ? `<span class="pct-pink">${fmt.pct(m.applied/Math.max(1,m.nonCardHolders))}</span> applied · ${fmt.num(m.uniqueNch)} unique` : `${fmt.num(m.uniqueNch)} unique · eligible for sign-up`}</div>
         </div>
         <div class="kpi-card accent">
           <div class="kpi-label">Applied for Card</div>
