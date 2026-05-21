@@ -6,22 +6,22 @@
 <meta name="theme-color" content="#fafafa" />
 <title>The Vault</title>
 <meta name="description" content="Performance Tracker" />
- 
+
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="SHARE Vault" />
 <meta property="og:title" content="SHARE Vault" />
 <meta property="og:description" content="Performance Tracker" />
 <meta property="og:url" content="https://kartikkhanna.github.io/sharevault/" />
- 
+
 <meta name="theme-color" content="#E6007E" />
- 
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
- 
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
- 
+
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
@@ -54,7 +54,7 @@ body {
   --shadow-elev: 0 4px 16px -4px rgba(255,51,153,0.2), 0 1px 3px rgba(0,0,0,0.4);
 }
 body { background: var(--page-bg); color: var(--ink); transition: background 240ms, color 240ms; }
- 
+
 .header-band {
   background: linear-gradient(135deg, var(--grad-1) 0%, var(--grad-2) 50%, var(--grad-3) 100%);
   padding: 24px 32px 20px; border-bottom: 1px solid rgba(0,0,0,0.04); position: relative;
@@ -85,7 +85,7 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
 .icon-btn:hover { background: var(--card-tint); color: var(--ink); border-color: var(--divider); }
 .icon-btn svg { width: 14px; height: 14px; }
 .icon-btn.spinning svg { animation: spin 700ms linear infinite; }
- 
+
 .filter-bar {
   display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
   max-width: 1600px; margin: 16px auto 0;
@@ -112,7 +112,7 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
   border-radius: 999px; cursor: pointer; outline: none;
 }
 .date-input[disabled] { opacity: 0.3; cursor: not-allowed; }
- 
+
 .progress-strip {
   max-width: 1600px; margin: 14px auto 0;
   display: flex; align-items: center; gap: 14px;
@@ -131,17 +131,17 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
   background: var(--pink); border-radius: 50%; transform: translateX(-50%);
   box-shadow: 0 0 0 3px var(--card); transition: left 1200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
- 
+
 .main { max-width: 1600px; margin: 0 auto; padding: 20px 32px 32px; }
 @media (max-width: 1200px) { .main { padding: 16px 20px; } .header-band { padding: 20px; } }
- 
+
 .section-head {
   font-size: 15px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink);
   margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;
 }
 .section-head .label-soft { font-weight: 400; color: var(--slate); }
 .section-head .small-meta { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
- 
+
 .dashboard-grid {
   display: grid; grid-template-columns: repeat(12, 1fr);
   grid-auto-rows: minmax(min-content, max-content); gap: 12px;
@@ -149,7 +149,7 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
 .kpi-strip { grid-column: span 12; display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
 @media (max-width: 1200px) { .kpi-strip { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 700px) { .kpi-strip { grid-template-columns: repeat(2, 1fr); } }
- 
+
 .kpi-card {
   background: var(--card); border-radius: var(--radius-md); padding: 16px 18px;
   box-shadow: var(--shadow-card); display: flex; flex-direction: column;
@@ -168,14 +168,14 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
 .kpi-card.hero .kpi-label, .kpi-card.hero .kpi-value, .kpi-card.hero .kpi-sub { color: white; }
 .kpi-card.hero .kpi-label { opacity: 0.85; }
 .kpi-card.hero .kpi-sub { opacity: 0.8; }
- 
+
 .chart-card {
   background: var(--card); border-radius: var(--radius-lg); padding: 18px 20px;
   box-shadow: var(--shadow-card); display: flex; flex-direction: column; min-height: 0;
 }
 .chart-card .chart-wrap { flex: 1; position: relative; min-height: 0; }
 .chart-card canvas { max-height: 100%; }
- 
+
 .span-daily-trend { grid-column: span 8; min-height: 280px; }
 .span-funnel { grid-column: span 4; min-height: 280px; }
 .span-location { grid-column: span 5; min-height: 260px; }
@@ -184,13 +184,13 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
 .span-prizes { grid-column: span 7; min-height: 240px; }
 .span-estimator { grid-column: span 5; min-height: 240px; }
 .span-dq { grid-column: span 12; min-height: 100px; }
- 
+
 @media (max-width: 1400px) {
   .span-daily-trend, .span-funnel, .span-estimator { grid-column: span 12; }
   .span-location, .span-cumulative, .span-dow, .span-prizes { grid-column: span 6; }
 }
 @media (max-width: 900px) { .dashboard-grid > * { grid-column: span 12 !important; } }
- 
+
 .funnel-vis { display: flex; flex-direction: column; gap: 6px; padding: 8px 0; }
 .funnel-row { display: grid; grid-template-columns: 100px 1fr auto; align-items: center; gap: 12px; }
 .funnel-row .fr-label { font-size: 11px; font-weight: 600; color: var(--ink-soft); letter-spacing: 0.02em; }
@@ -206,7 +206,7 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
 .funnel-row:nth-child(3) .funnel-bar-fill { background: linear-gradient(90deg, var(--pink-soft), #ff80c2); }
 .funnel-row:nth-child(4) .funnel-bar-fill { background: linear-gradient(90deg, #ff80c2, var(--success)); }
 .funnel-row .fr-conv { font-size: 10px; color: var(--slate); font-weight: 600; letter-spacing: 0.04em; min-width: 40px; text-align: right; }
- 
+
 .estimator-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
 .est-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 14px; align-items: end; }
 .est-input { display: flex; flex-direction: column; gap: 4px; }
@@ -232,7 +232,7 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
 }
 .est-output .eo-label { font-size: 9px; font-weight: 700; color: var(--pink-deep); letter-spacing: 0.1em; text-transform: uppercase; }
 .est-output .eo-num { font-size: 28px; font-weight: 800; color: var(--pink-deep); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; line-height: 1; margin-top: 2px; }
- 
+
 .dq-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 @media (max-width: 900px) { .dq-row { grid-template-columns: repeat(2, 1fr); } }
 .dq-cell {
@@ -245,7 +245,7 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
 .dq-cell.issue .dq-num { color: var(--danger); }
 .dq-cell.issue .dq-label { color: var(--danger); }
 .dq-cell.clean .dq-num { color: var(--success); }
- 
+
 .loading { min-height: 70vh; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
 .loading-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--pink); animation: pulse 1400ms ease-in-out infinite; }
 .loading-label { font-size: 11px; font-weight: 600; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; }
@@ -255,7 +255,7 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
 }
 .error-state h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
 .error-state pre { font-size: 11px; background: var(--card); padding: 10px; border-radius: 6px; margin-top: 10px; overflow-x: auto; color: var(--ink-soft); }
- 
+
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 @keyframes pulse { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.4); } }
 @keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -264,7 +264,7 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
 .fade-in.d2 { animation-delay: 80ms; }
 .fade-in.d3 { animation-delay: 120ms; }
 .fade-in.d4 { animation-delay: 160ms; }
- 
+
 @media print {
   .icon-btn { display: none !important; }
   body { background: white !important; }
@@ -273,20 +273,20 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
 </style>
 </head>
 <body data-theme="light">
- 
+
 <div id="root">
   <div class="loading">
     <div class="loading-dot"></div>
     <div class="loading-label">Loading activation data</div>
   </div>
 </div>
- 
+
 <script>
 const CONFIG = {
   API_URL: 'https://script.google.com/macros/s/AKfycbylwJ0xQryr7wCqjtlUeMRubvWPjx3pQgm0r6EO_BP_Fu2tjg_T7bkQ_cvB3oHqisuCnQ/exec?token=sv-7f3x9k2p-mall-of-emirates-2026-q5tj8w4n',
   REFRESH_INTERVAL_MS: 5 * 60 * 1000
 };
- 
+
 const state = {
   raw: null,
   filters: { mode: 'all', date: null, location: 'all' },
@@ -294,15 +294,35 @@ const state = {
   theme: 'light',
   charts: {}
 };
- 
+
 const fmt = {
   num: n => Number(n || 0).toLocaleString('en-US'),
   pct: n => `${Math.round(n * 100)}%`,
   date: iso => { if (!iso) return ''; const d = new Date(iso + 'T00:00:00'); return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }); },
   fullDate: iso => { if (!iso) return ''; const d = new Date(iso + 'T00:00:00'); return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }); },
-  timestamp: iso => { if (!iso) return ''; const d = new Date(iso); return d.toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false }); }
+  timestamp: iso => { if (!iso) return ''; const d = new Date(iso); return d.toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false }); },
+  relativeTime: iso => {
+    if (!iso) return '';
+    const then = new Date(iso).getTime();
+    const now = Date.now();
+    const diff = Math.max(0, now - then);
+    const seconds = Math.round(diff / 1000);
+    const minutes = Math.round(diff / 60000);
+    const hours = Math.round(diff / 3600000);
+    const days = Math.round(diff / 86400000);
+    if (seconds < 30) return 'just now';
+    if (minutes < 1) return `${seconds}s ago`;
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) {
+      const remMin = minutes - (hours * 60);
+      return remMin > 0 && hours < 6 ? `${hours}h ${remMin}m ago` : `${hours}h ago`;
+    }
+    if (days < 7) return `${days}d ago`;
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+  }
 };
- 
+
 function todayISO() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -319,7 +339,7 @@ function eachDate(s, e) {
   return out;
 }
 function dayOfWeek(iso) { return new Date(iso + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short' }); }
- 
+
 // =============================================================
 // DEDUPE — strict (mobile AND email both match), keep FIRST visit
 // =============================================================
@@ -385,7 +405,7 @@ function dedupeSourceData(raw) {
     }
   };
 }
- 
+
 function applyFilters(raw, filters) {
   if (!raw) return null;
   let activeDate = null;
@@ -402,7 +422,7 @@ function applyFilters(raw, filters) {
     activeDate
   };
 }
- 
+
 function computeMetrics(filtered) {
   const ch = filtered.cardHolders;
   const nch = filtered.nonCardHolders;
@@ -415,7 +435,7 @@ function computeMetrics(filtered) {
     prizes: ch.filter(r => r.prize).length + nch.filter(r => r.prize).length
   };
 }
- 
+
 function locationSplit(raw, filters) {
   const locs = ['MoE', 'DCC', 'MCC'];
   let activeDate = null;
@@ -435,7 +455,7 @@ function locationSplit(raw, filters) {
     };
   });
 }
- 
+
 function dailyTimeline(raw) {
   const dates = eachDate(raw.period.start, raw.period.end);
   let cumulative = 0;
@@ -446,7 +466,7 @@ function dailyTimeline(raw) {
     return { date: d, cardHolders: ch, nonCardHolders: nch, total: ch + nch, cumulative };
   });
 }
- 
+
 function dayOfWeekSplit(raw) {
   const days = { Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0, Sun: 0 };
   const all = [...raw.cardHolders, ...raw.nonCardHolders];
@@ -458,7 +478,7 @@ function dayOfWeekSplit(raw) {
   });
   return Object.entries(days).map(([day, count]) => ({ day, count }));
 }
- 
+
 function prizeSplit(filtered) {
   const categories = [
     { label: 'Gold 10g',     pattern: /gold coin \(10g\)/i },
@@ -480,14 +500,14 @@ function prizeSplit(filtered) {
     count: all.filter(p => c.pattern.test(p)).length
   })).sort((a, b) => b.count - a.count);
 }
- 
+
 function render() {
   const raw = state.raw;
   if (!raw) return;
   const filtered = applyFilters(raw, state.filters);
   const m = computeMetrics(filtered);
   const locs = locationSplit(raw, state.filters);
- 
+
   const periodStart = raw.period.start;
   const periodEnd = raw.period.end;
   const totalDays = daysBetween(periodStart, periodEnd) + 1;
@@ -495,7 +515,7 @@ function render() {
   const dayOfPeriod = Math.max(1, Math.min(totalDays, daysBetween(periodStart, today) + 1));
   const periodPct = Math.max(0, Math.min(1, dayOfPeriod / totalDays));
   const daysRemaining = Math.max(0, daysBetween(today, periodEnd));
- 
+
   const allNch = raw.nonCardHolders.length;
   const daysSinceStart = Math.max(1, daysBetween(periodStart, today) + 1);
   const avgDailyNch = allNch / daysSinceStart;
@@ -505,13 +525,13 @@ function render() {
   const avgDailyFootfall = totalFootfall / daysSinceStart;
   const projectedFootfall = Math.round(totalFootfall + (avgDailyFootfall * daysRemaining));
   const estCardsIssued = Math.round(totalApplied * state.rates.lead);
- 
+
   const dq = raw.dataQuality || {};
- 
+
   const SUN_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
   const MOON_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
   const REFRESH_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.41-6.36L23 10"/><path d="M23 4v6h-6"/><path d="M21 12a9 9 0 0 1-15.41 6.36L1 14"/><path d="M1 20v-6h6"/></svg>`;
- 
+
   const html = `
   <header class="header-band">
     <div class="header-row">
@@ -523,12 +543,14 @@ function render() {
       </div>
       <div class="meta-block">
         <div class="partners">ENBD · Visa · MAF</div>
-        <div class="timestamp">Last refresh · ${fmt.timestamp(raw.generatedAt)}</div>
+        <div class="timestamp" title="Exact: ${fmt.timestamp(raw.dataLastUpdated || raw.generatedAt)}${raw.dataLastUpdated ? '' : ' (sheet timestamp not available — showing page fetch time)'}">
+          Data ${fmt.relativeTime(raw.dataLastUpdated || raw.generatedAt)}
+        </div>
         <button class="icon-btn" id="refreshBtn" title="Refresh">${REFRESH_ICON}</button>
         <button class="icon-btn" id="themeBtn" title="Toggle theme">${state.theme === 'light' ? MOON_ICON : SUN_ICON}</button>
       </div>
     </div>
- 
+
     <div class="filter-bar">
       <div class="filter-pill">
         <span class="label">View</span>
@@ -552,7 +574,7 @@ function render() {
         </div>
       </div>
     </div>
- 
+
     <div class="progress-strip">
       <div class="text-left">Day ${dayOfPeriod} of ${totalDays}</div>
       <div class="progress-track">
@@ -562,10 +584,10 @@ function render() {
       <div class="text-right">${fmt.pct(periodPct)} · ${daysRemaining} days remaining</div>
     </div>
   </header>
- 
+
   <div class="main">
     <div class="dashboard-grid">
- 
+
       <div class="kpi-strip fade-in">
         <div class="kpi-card hero">
           <div class="kpi-label">Total Footfall <span style="opacity:0.7;font-size:9px;letter-spacing:0.3px;">· UNIQUE</span></div>
@@ -598,7 +620,7 @@ function render() {
           <div class="kpi-sub">${m.footfall ? fmt.pct(m.prizes/m.footfall) + ' of footfall' : '—'}</div>
         </div>
       </div>
- 
+
       <div class="chart-card span-daily-trend fade-in d1">
         <div class="section-head">
           <span><span class="label-soft">Daily</span> Footfall Trend</span>
@@ -606,7 +628,7 @@ function render() {
         </div>
         <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
       </div>
- 
+
       <div class="chart-card span-funnel fade-in d1">
         <div class="section-head">
           <span><span class="label-soft">Acquisition</span> Funnel</span>
@@ -619,7 +641,7 @@ function render() {
           <span style="font-weight: 700; color: var(--pink); min-width: 40px; text-align: right;" id="leadRateLabel">${fmt.pct(state.rates.lead)}</span>
         </div>
       </div>
- 
+
       <div class="chart-card span-location fade-in d2">
         <div class="section-head">
           <span><span class="label-soft">By</span> Location</span>
@@ -627,7 +649,7 @@ function render() {
         </div>
         <div class="chart-wrap"><canvas id="locationChart"></canvas></div>
       </div>
- 
+
       <div class="chart-card span-cumulative fade-in d2">
         <div class="section-head">
           <span><span class="label-soft">Cumulative</span> Acquisition</span>
@@ -635,7 +657,7 @@ function render() {
         </div>
         <div class="chart-wrap"><canvas id="cumulativeChart"></canvas></div>
       </div>
- 
+
       <div class="chart-card span-dow fade-in d2">
         <div class="section-head">
           <span><span class="label-soft">Day of</span> Week Pattern</span>
@@ -643,7 +665,7 @@ function render() {
         </div>
         <div class="chart-wrap"><canvas id="dowChart"></canvas></div>
       </div>
- 
+
       <div class="chart-card span-prizes fade-in d3">
         <div class="section-head">
           <span><span class="label-soft">Prize</span> Distribution</span>
@@ -651,7 +673,7 @@ function render() {
         </div>
         <div class="chart-wrap"><canvas id="prizeChart"></canvas></div>
       </div>
- 
+
       <div class="chart-card span-estimator fade-in d3">
         <div class="section-head">
           <span><span class="label-soft">Sign-Up</span> Estimator</span>
@@ -697,7 +719,7 @@ function render() {
           </div>
         </div>
       </div>
- 
+
       <div class="chart-card span-dq fade-in d4">
         <div class="section-head">
           <span><span class="label-soft">Data</span> Quality</span>
@@ -722,18 +744,18 @@ function render() {
           </div>
         </div>
       </div>
- 
+
     </div>
   </div>
   `;
- 
+
   document.getElementById('root').innerHTML = html;
- 
+
   renderFunnel(totalFootfall, allNch, totalApplied, estCardsIssued);
   setTimeout(() => { renderCharts(raw, filtered, locs); }, 60);
   attachHandlers();
 }
- 
+
 function renderFunnel(footfall, nch, applied, issued) {
   const max = Math.max(1, footfall);
   const stages = [
@@ -756,14 +778,14 @@ function renderFunnel(footfall, nch, applied, issued) {
     `;
   }).join('');
 }
- 
+
 function destroyChart(key) {
   if (state.charts[key]) {
     state.charts[key].destroy();
     delete state.charts[key];
   }
 }
- 
+
 function chartColors() {
   const isDark = state.theme === 'dark';
   return {
@@ -776,7 +798,7 @@ function chartColors() {
     muted: isDark ? '#a1a1a1' : '#9a9a9a'
   };
 }
- 
+
 function commonOpts() {
   const c = chartColors();
   return {
@@ -799,7 +821,7 @@ function commonOpts() {
     }
   };
 }
- 
+
 function renderCharts(raw, filtered, locs) {
   const c = chartColors();
   const daily = dailyTimeline(raw);
@@ -807,7 +829,7 @@ function renderCharts(raw, filtered, locs) {
   const prizes = prizeSplit(filtered);
   const today = todayISO();
   const todayIdx = daily.findIndex(d => d.date === today);
- 
+
   destroyChart('trend');
   state.charts.trend = new Chart(document.getElementById('trendChart'), {
     type: 'bar',
@@ -826,7 +848,7 @@ function renderCharts(raw, filtered, locs) {
       }
     }
   });
- 
+
   destroyChart('location');
   state.charts.location = new Chart(document.getElementById('locationChart'), {
     type: 'bar',
@@ -840,7 +862,7 @@ function renderCharts(raw, filtered, locs) {
     },
     options: commonOpts()
   });
- 
+
   destroyChart('cumulative');
   const cumActual = daily.map((d, i) => i <= todayIdx ? d.cumulative : null);
   const daysElapsed = Math.max(1, todayIdx + 1);
@@ -863,7 +885,7 @@ function renderCharts(raw, filtered, locs) {
     },
     options: commonOpts()
   });
- 
+
   destroyChart('dow');
   state.charts.dow = new Chart(document.getElementById('dowChart'), {
     type: 'bar',
@@ -873,7 +895,7 @@ function renderCharts(raw, filtered, locs) {
     },
     options: { ...commonOpts(), plugins: { ...commonOpts().plugins, legend: { display: false } } }
   });
- 
+
   destroyChart('prizes');
   const topPrizes = prizes.slice(0, 8);
   state.charts.prizes = new Chart(document.getElementById('prizeChart'), {
@@ -885,7 +907,7 @@ function renderCharts(raw, filtered, locs) {
     options: { ...commonOpts(), indexAxis: 'y', plugins: { ...commonOpts().plugins, legend: { display: false } } }
   });
 }
- 
+
 function attachHandlers() {
   document.getElementById('themeBtn').addEventListener('click', () => {
     state.theme = state.theme === 'light' ? 'dark' : 'light';
@@ -893,13 +915,13 @@ function attachHandlers() {
     localStorage.setItem('share-dashboard-theme', state.theme);
     render();
   });
- 
+
   document.getElementById('refreshBtn').addEventListener('click', () => {
     const btn = document.getElementById('refreshBtn');
     btn.classList.add('spinning');
     fetchData().finally(() => { setTimeout(() => btn.classList.remove('spinning'), 500); });
   });
- 
+
   document.getElementById('modeSegment').querySelectorAll('button').forEach(b => {
     b.addEventListener('click', () => {
       state.filters.mode = b.dataset.mode;
@@ -907,20 +929,20 @@ function attachHandlers() {
       render();
     });
   });
- 
+
   document.getElementById('locSegment').querySelectorAll('button').forEach(b => {
     b.addEventListener('click', () => {
       state.filters.location = b.dataset.loc;
       render();
     });
   });
- 
+
   document.getElementById('dateInput').addEventListener('change', e => {
     state.filters.date = e.target.value;
     if (state.filters.mode !== 'date') state.filters.mode = 'date';
     render();
   });
- 
+
   const signupSlider = document.getElementById('signupSlider');
   if (signupSlider) {
     signupSlider.addEventListener('input', e => {
@@ -940,7 +962,7 @@ function attachHandlers() {
     });
   }
 }
- 
+
 function updateProjections() {
   const raw = state.raw;
   if (!raw) return;
@@ -959,7 +981,7 @@ function updateProjections() {
   const totalFootfall = raw.cardHolders.length + allNch;
   renderFunnel(totalFootfall, allNch, totalApplied, estIssued);
 }
- 
+
 async function fetchData() {
   try {
     if (CONFIG.API_URL.includes('PASTE_YOUR')) {
@@ -980,16 +1002,27 @@ async function fetchData() {
     `;
   }
 }
- 
+
 const savedTheme = localStorage.getItem('share-dashboard-theme');
 if (savedTheme) {
   state.theme = savedTheme;
   document.body.setAttribute('data-theme', savedTheme);
 }
- 
+
 fetchData();
 setInterval(fetchData, CONFIG.REFRESH_INTERVAL_MS);
+
+// Tick the "Data X ago" display every 60s so it stays accurate
+// without triggering a full data refetch.
+setInterval(() => {
+  if (!state.raw) return;
+  const el = document.querySelector('.meta-block .timestamp');
+  if (el) {
+    const stamp = state.raw.dataLastUpdated || state.raw.generatedAt;
+    el.textContent = `Data ${fmt.relativeTime(stamp)}`;
+    el.title = `Exact: ${fmt.timestamp(stamp)}${state.raw.dataLastUpdated ? '' : ' (sheet timestamp not available — showing page fetch time)'}`;
+  }
+}, 60000);
 </script>
 </body>
 </html>
- 
