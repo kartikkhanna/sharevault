@@ -246,6 +246,92 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
 .dq-cell.issue .dq-label { color: var(--danger); }
 .dq-cell.clean .dq-num { color: var(--success); }
 
+/* =========================================================
+   REJECTION CATEGORIZATION — Why Not Applied
+   ========================================================= */
+.span-rejection { grid-column: span 12; min-height: 460px; }
+.rejection-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr 1fr;
+  gap: 14px;
+  margin-top: 4px;
+}
+@media (max-width: 1100px) { .rejection-grid { grid-template-columns: 1fr; } }
+.rej-card {
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  min-height: 380px;
+}
+.rej-card-warm { background: linear-gradient(180deg, #fff5fa 0%, #ffffff 100%); border-color: #f5c8de; }
+.rej-card-rejected { background: linear-gradient(180deg, #fff7f5 0%, #ffffff 100%); border-color: #f5d4c8; }
+.rej-card-pipeline { background: linear-gradient(180deg, #f5f9f6 0%, #ffffff 100%); border-color: #c8e0d0; }
+[data-theme="dark"] .rej-card-warm { background: linear-gradient(180deg, rgba(230,0,126,0.08) 0%, rgba(255,255,255,0.02) 100%); border-color: rgba(230,0,126,0.3); }
+[data-theme="dark"] .rej-card-rejected { background: linear-gradient(180deg, rgba(200,16,46,0.08) 0%, rgba(255,255,255,0.02) 100%); border-color: rgba(200,16,46,0.3); }
+[data-theme="dark"] .rej-card-pipeline { background: linear-gradient(180deg, rgba(31,138,76,0.08) 0%, rgba(255,255,255,0.02) 100%); border-color: rgba(31,138,76,0.3); }
+
+.rej-title { font-size: 13px; font-weight: 700; letter-spacing: 0.2px; color: var(--ink); }
+.rej-title .icon { margin-right: 6px; font-size: 14px; }
+.rej-count { font-size: 30px; font-weight: 700; line-height: 1; margin: 6px 0 4px; font-variant-numeric: tabular-nums; }
+.rej-count-warm { color: var(--pink); }
+.rej-count-rejected { color: #c8102e; }
+.rej-count-pipeline { color: #1f8a4c; }
+.rej-sub { font-size: 11px; color: var(--slate); margin-bottom: 12px; font-weight: 500; line-height: 1.35; }
+.rej-cat-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+.rej-cat-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; font-size: 11px; }
+.rej-cat-label { color: var(--ink-soft); font-weight: 500; display: flex; align-items: center; gap: 6px; overflow: hidden; }
+.rej-cat-label .cat-text { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; flex-shrink: 1; min-width: 0; }
+.rej-cat-bar { flex: 1; height: 4px; background: var(--hairline); border-radius: 2px; overflow: hidden; min-width: 30px; }
+.rej-cat-bar-fill { height: 100%; border-radius: 2px; transition: width 400ms ease; }
+.rej-cat-bar-fill.warm { background: linear-gradient(90deg, var(--pink), #ff4ba8); }
+.rej-cat-bar-fill.rejected { background: linear-gradient(90deg, #c8102e, #e8556f); }
+.rej-cat-bar-fill.pipeline { background: linear-gradient(90deg, #1f8a4c, #4daa70); }
+.rej-cat-num { font-size: 11px; font-weight: 700; color: var(--ink); min-width: 24px; text-align: right; font-variant-numeric: tabular-nums; }
+
+.rej-leads-head {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.5px; color: var(--slate);
+  text-transform: uppercase; margin: 6px 0 6px;
+  padding-bottom: 6px; border-bottom: 1px solid var(--hairline);
+}
+.rej-leads-list {
+  flex: 1; overflow-y: auto; max-height: 220px;
+  padding-right: 4px; display: flex; flex-direction: column; gap: 6px;
+}
+.rej-leads-list::-webkit-scrollbar { width: 6px; }
+.rej-leads-list::-webkit-scrollbar-thumb { background: var(--hairline); border-radius: 3px; }
+.rej-lead {
+  background: rgba(255,255,255,0.6);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  padding: 7px 9px;
+  font-size: 10.5px;
+  line-height: 1.4;
+}
+[data-theme="dark"] .rej-lead { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.06); }
+.rej-lead-name {
+  font-weight: 600; color: var(--ink); margin-bottom: 2px;
+  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+  font-size: 11px;
+}
+.rej-lead-name .name-text { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; flex-shrink: 1; min-width: 0; }
+.rej-lead-loc {
+  font-size: 9px; font-weight: 600;
+  background: rgba(230,0,126,0.1); color: var(--pink);
+  padding: 1px 5px; border-radius: 3px; letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+.rej-lead-contact { color: var(--slate); font-size: 10px; display: flex; flex-direction: column; gap: 1px; font-variant-numeric: tabular-nums; }
+.rej-lead-contact span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rej-lead-comment {
+  margin-top: 4px; padding-top: 4px;
+  border-top: 1px dotted var(--hairline);
+  color: var(--ink-soft); font-style: italic;
+  font-size: 10px; line-height: 1.35;
+}
+.rej-empty { text-align: center; color: var(--muted); font-size: 11px; padding: 20px 0; font-style: italic; }
+
 .loading { min-height: 70vh; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
 .loading-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--pink); animation: pulse 1400ms ease-in-out infinite; }
 .loading-label { font-size: 11px; font-weight: 600; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; }
@@ -745,6 +831,8 @@ function render() {
         </div>
       </div>
 
+      ${renderRejectionSection(filtered.nonCardHolders)}
+
     </div>
   </div>
   `;
@@ -754,6 +842,179 @@ function render() {
   renderFunnel(totalFootfall, allNch, totalApplied, estCardsIssued);
   setTimeout(() => { renderCharts(raw, filtered, locs); }, 60);
   attachHandlers();
+}
+
+// =============================================================
+// REJECTION CATEGORIZATION
+// Priority order matters — first keyword match wins.
+// Rules calibrated against real promoter comments in the NCH sheet.
+// =============================================================
+const REJECTION_RULES = [
+  // WARM LEADS (highest priority — these are the revenue opportunity)
+  { bucket: 'warm', label: 'Business Owner / VIP', icon: '💼',
+    keywords: ['business owner', 'businessowner', 'bussines owner', 'bussiness owner', 'has a business', 'has business', 'company holder', 'vip', 'entrepreneur', 'investor'] },
+  { bucket: 'warm', label: 'Self-Employed', icon: '🧑‍💼',
+    keywords: ['self employed', 'self-employed', 'swlf employed', 'selfemployed', 'self employ'] },
+  { bucket: 'warm', label: 'Already Has Card (Upgrade)', icon: '💳',
+    keywords: ['has 2 card', 'has 2 credit', 'titanium card', 'convert card', 'noon to share', 'wants to convert', 'already has', 'has a card'] },
+
+  // PIPELINE (in flight — not rejections, just not yet completed)
+  { bucket: 'pipeline', label: 'Approved', icon: '✅',
+    keywords: ['approved', 'application done', 'app submitted', 'application submitted', 'card applied', 'application approved', 'card approved', 'platinum'] },
+  { bucket: 'pipeline', label: 'Under Review', icon: '🔄',
+    keywords: ['under review', 'under process', 'under progress', 'waiting for approval', 'waiting approval', 'application under', 'applied under review', 'applies under review', 'card under review', 'in process'] },
+  { bucket: 'pipeline', label: 'Influencer / Staff', icon: '⭐',
+    keywords: ['influencer entry', 'staff application', 'enbd staff', 'maf staff'] },
+
+  // GENUINE REJECTIONS
+  { bucket: 'rejected', label: 'Rejected — Nationality', icon: '🌍',
+    keywords: ['russian', 'restricted country', 'restricted nationality', 'because of restrictions', 'because of nationality', 'customer from russia', 'not eligible (russian', 'not eligible ( russian'] },
+  { bucket: 'rejected', label: 'Rejected — Income / Salary', icon: '💰',
+    keywords: ['salary not eligible', 'does not have a salary', 'no salary', 'does not have salary', 'doesnt have salary', 'has no salary'] },
+  { bucket: 'rejected', label: 'Housewife / Student / Visitor', icon: '👤',
+    keywords: ['housewife', 'house wife', 'student', 'visitor', 'tourist', 'doesnt work', 'does not work', "doesn't work"] },
+  { bucket: 'rejected', label: 'Rejected — Age', icon: '🎂',
+    keywords: ['above 60', 'over 60', 'age limit', 'too old', '60years', '60 years'] },
+  { bucket: 'rejected', label: 'No UAE Bank Account', icon: '🏦',
+    keywords: ['no bank account', 'no uae bank', 'does not have a uae bank', 'does not have any bank', 'new in the country', 'new to country', 'months left'] },
+  { bucket: 'rejected', label: 'Technical / Docs Issue', icon: '⚙️',
+    keywords: ['passport', 'otp', "couldn't apply", 'couldnt apply', "couldn't proceed", 'couldnt proceed', "couldn't upload", 'couldnt upload', 'system bug', 'linking the account', 'technical issue', 'application slow', "application couldn't", 'document not available', 'docs not available', "didn't process", "didn't proceed", 'unable to process', 'just loading', 'app issue', 'problem with share', 'problem linking', 'renewing id', 'will fix'] },
+  { bucket: 'rejected', label: 'Will Apply Later', icon: '⏰',
+    keywords: ['apply later', 'will apply', 'apply at home', 'register later', 'will do later', 'will register', 'think about it', 'come back', 'be back', 'will be back', 'do later', 'in rush', 'do by her self', 'do by him self', 'by herself', 'by himself', 'do at home', 'process at home', 'try later', 'will try', 'open later', 'do it later', 'check with family'] },
+  { bucket: 'rejected', label: 'Not Interested', icon: '🚫',
+    keywords: ['not interested', "doesn't want", 'doesnt want', 'does not want', 'not willing', 'did not want', 'didnt want', "didn't want", 'not  interested'] },
+  { bucket: 'rejected', label: 'Contact Bank', icon: '☎️',
+    keywords: ['contact by bank', 'contact the bank', 'needs to be contacted', 'need to be contacted', 'contact by maf', 'maf team'] },
+  { bucket: 'rejected', label: 'Rejected — Other', icon: '❌',
+    keywords: ['rejected', 'reject', 'not approved', 'not eligible', 'bank eligibility', 'eligibility criteria', 'eligibility issue', 'card rejected', 'application rejected'] }
+];
+
+function categorizeComment(rawComment) {
+  if (!rawComment) return null;
+  const c = String(rawComment).toLowerCase().trim();
+  if (!c) return null;
+  for (const rule of REJECTION_RULES) {
+    for (const kw of rule.keywords) {
+      if (c.includes(kw)) return rule;
+    }
+  }
+  return { bucket: 'rejected', label: 'Other / Uncategorized', icon: '📝', keywords: [] };
+}
+
+function buildRejectionData(nonCardHolders) {
+  const buckets = {
+    warm: { rows: [], categories: {} },
+    rejected: { rows: [], categories: {} },
+    pipeline: { rows: [], categories: {} }
+  };
+  for (const row of nonCardHolders) {
+    const comment = (row.comment || '').trim();
+    if (!comment) continue;
+    const rule = categorizeComment(comment);
+    if (!rule) continue;
+    const b = buckets[rule.bucket];
+    if (!b) continue;
+    b.rows.push({ ...row, _category: rule.label, _icon: rule.icon });
+    b.categories[rule.label] = (b.categories[rule.label] || 0) + 1;
+  }
+  for (const key of Object.keys(buckets)) {
+    buckets[key].categoryList = Object.entries(buckets[key].categories)
+      .map(([label, count]) => ({ label, count, icon: REJECTION_RULES.find(r => r.label === label)?.icon || '📝' }))
+      .sort((a, b) => b.count - a.count);
+    buckets[key].rows.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  }
+  return buckets;
+}
+
+function renderRejectionSection(nonCardHolders) {
+  const data = buildRejectionData(nonCardHolders);
+  const totalCategorized = data.warm.rows.length + data.rejected.rows.length + data.pipeline.rows.length;
+
+  const buildCategoryBars = (catList, bucketClass) => {
+    if (!catList.length) return '<div class="rej-empty">No data yet</div>';
+    const max = Math.max(...catList.map(c => c.count));
+    return catList.map(c => {
+      const pct = (c.count / max) * 100;
+      return `
+        <div class="rej-cat-row">
+          <div class="rej-cat-label">
+            <span style="font-size:11px;">${c.icon}</span>
+            <span class="cat-text">${c.label}</span>
+            <div class="rej-cat-bar"><div class="rej-cat-bar-fill ${bucketClass}" style="width:${pct}%"></div></div>
+          </div>
+          <div class="rej-cat-num">${c.count}</div>
+        </div>
+      `;
+    }).join('');
+  };
+
+  const buildLeadCard = (row) => {
+    const escapedComment = row.comment ? String(row.comment).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : '';
+    const escapedName = row.name ? String(row.name).replace(/</g, '&lt;').replace(/>/g, '&gt;') : 'Unknown';
+    return `
+      <div class="rej-lead">
+        <div class="rej-lead-name">
+          <span class="name-text">${row._icon || ''} ${escapedName}</span>
+          ${row.location ? `<span class="rej-lead-loc">${row.location}</span>` : ''}
+        </div>
+        <div class="rej-lead-contact">
+          ${row.mobile ? `<span>📱 ${row.mobile}</span>` : ''}
+          ${row.email ? `<span>✉️ ${row.email}</span>` : ''}
+        </div>
+        ${escapedComment ? `<div class="rej-lead-comment">"${escapedComment}"</div>` : ''}
+      </div>
+    `;
+  };
+
+  const warmList = data.warm.rows.length
+    ? data.warm.rows.map(buildLeadCard).join('')
+    : '<div class="rej-empty">No warm leads captured yet</div>';
+  const rejectedList = data.rejected.rows.length
+    ? data.rejected.rows.slice(0, 25).map(buildLeadCard).join('')
+    : '<div class="rej-empty">No rejections captured yet</div>';
+  const pipelineList = data.pipeline.rows.length
+    ? data.pipeline.rows.slice(0, 25).map(buildLeadCard).join('')
+    : '<div class="rej-empty">No pipeline entries yet</div>';
+
+  return `
+    <div class="chart-card span-rejection fade-in d4">
+      <div class="section-head">
+        <span><span class="label-soft">Why Not</span> Applied — Comments Analysis</span>
+        <span class="small-meta">${totalCategorized} categorised of ${nonCardHolders.length} NCH</span>
+      </div>
+
+      <div class="rejection-grid">
+
+        <div class="rej-card rej-card-warm">
+          <div class="rej-title"><span class="icon">🔥</span>Warm Leads</div>
+          <div class="rej-count rej-count-warm">${data.warm.rows.length}</div>
+          <div class="rej-sub">Business owners, self-employed, upgrade candidates — needs CRM call</div>
+          <div class="rej-cat-list">${buildCategoryBars(data.warm.categoryList, 'warm')}</div>
+          <div class="rej-leads-head">Contact List · scroll for all</div>
+          <div class="rej-leads-list">${warmList}</div>
+        </div>
+
+        <div class="rej-card rej-card-rejected">
+          <div class="rej-title"><span class="icon">❌</span>Rejections</div>
+          <div class="rej-count rej-count-rejected">${data.rejected.rows.length}</div>
+          <div class="rej-sub">Genuine no — eligibility, income, tech, not interested</div>
+          <div class="rej-cat-list">${buildCategoryBars(data.rejected.categoryList, 'rejected')}</div>
+          <div class="rej-leads-head">Recent · top 25 shown</div>
+          <div class="rej-leads-list">${rejectedList}</div>
+        </div>
+
+        <div class="rej-card rej-card-pipeline">
+          <div class="rej-title"><span class="icon">⏳</span>In Pipeline</div>
+          <div class="rej-count rej-count-pipeline">${data.pipeline.rows.length}</div>
+          <div class="rej-sub">Under review or approved — not a failure, track separately</div>
+          <div class="rej-cat-list">${buildCategoryBars(data.pipeline.categoryList, 'pipeline')}</div>
+          <div class="rej-leads-head">Recent · top 25 shown</div>
+          <div class="rej-leads-list">${pipelineList}</div>
+        </div>
+
+      </div>
+    </div>
+  `;
 }
 
 function renderFunnel(footfall, nch, applied, issued) {
