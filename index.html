@@ -361,6 +361,33 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
 .fade-in.d3 { animation-delay: 120ms; }
 .fade-in.d4 { animation-delay: 160ms; }
 
+/* Toast notification — used by Sync Now button */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--ink);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 240ms ease, transform 240ms ease;
+  max-width: 90vw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.toast-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast-info { background: #1a1a1a; }
+.toast-success { background: #1f8a4c; }
+.toast-error { background: #c8102e; }
+[data-theme="dark"] .toast { box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
+
 @media print {
   .icon-btn { display: none !important; }
   body { background: white !important; }
@@ -627,6 +654,7 @@ function render() {
   const SUN_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
   const MOON_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
   const REFRESH_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.41-6.36L23 10"/><path d="M23 4v6h-6"/><path d="M21 12a9 9 0 0 1-15.41 6.36L1 14"/><path d="M1 20v-6h6"/></svg>`;
+  const SYNC_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v6h6"/><path d="M20 20v-6h-6"/><path d="M4 10a8 8 0 0 1 14.93-2"/><path d="M20 14a8 8 0 0 1-14.93 2"/></svg>`;
   const DOWNLOAD_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
 
   const html = `
@@ -643,6 +671,7 @@ function render() {
         <div class="timestamp" title="Exact: ${fmt.timestamp(raw.dataLastUpdated || raw.generatedAt)}${raw.dataLastUpdated ? '' : ' (sheet timestamp not available — showing page fetch time)'}">
           Data ${fmt.relativeTime(raw.dataLastUpdated || raw.generatedAt)}
         </div>
+        <button class="icon-btn" id="syncBtn" title="Pull latest from agency xlsx now">${SYNC_ICON}</button>
         <button class="icon-btn" id="refreshBtn" title="Refresh">${REFRESH_ICON}</button>
         <button class="icon-btn" id="downloadBtn" title="Download as PNG">${DOWNLOAD_ICON}</button>
         <button class="icon-btn" id="themeBtn" title="Toggle theme">${state.theme === 'light' ? MOON_ICON : SUN_ICON}</button>
@@ -1212,6 +1241,46 @@ function attachHandlers() {
     render();
   });
 
+  document.getElementById('syncBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('syncBtn');
+    if (btn.classList.contains('spinning')) return;
+
+    btn.classList.add('spinning');
+    btn.disabled = true;
+
+    // Show toast — sync can take 15-30s, user needs feedback
+    showToast('Pulling latest from agency xlsx…', 'info', 0);  // 0 = no auto-hide
+
+    try {
+      const separator = CONFIG.API_URL.includes('?') ? '&' : '?';
+      const url = CONFIG.API_URL + separator + 'mode=sync&_t=' + Date.now();
+
+      const res = await fetch(url, { cache: 'no-store' });
+      const result = await res.json();
+
+      if (result.error) throw new Error(result.error);
+
+      const appended = result.lastSyncAppended || 0;
+      const elapsed = result.elapsedSeconds || 0;
+      const msg = appended > 0
+        ? `Pulled ${appended} new row${appended === 1 ? '' : 's'} in ${elapsed}s`
+        : `Already up to date · ${elapsed}s`;
+      showToast(msg, 'success', 3000);
+
+      // Refetch dashboard data so new rows appear
+      await fetchData();
+
+    } catch (err) {
+      console.error('Sync failed:', err);
+      showToast('Sync failed: ' + err.message, 'error', 5000);
+    } finally {
+      setTimeout(() => {
+        btn.classList.remove('spinning');
+        btn.disabled = false;
+      }, 600);
+    }
+  });
+
   document.getElementById('refreshBtn').addEventListener('click', () => {
     const btn = document.getElementById('refreshBtn');
     btn.classList.add('spinning');
@@ -1220,36 +1289,30 @@ function attachHandlers() {
 
   document.getElementById('downloadBtn').addEventListener('click', async () => {
     const btn = document.getElementById('downloadBtn');
-    if (btn.classList.contains('spinning')) return;  // already running
+    if (btn.classList.contains('spinning')) return;
 
     btn.classList.add('spinning');
     btn.disabled = true;
 
     try {
-      // Find the dashboard container — capture everything inside it
       const target = document.querySelector('.dashboard') || document.body;
 
-      // Build a filter-aware filename: share-vault-[location]-[mode]-[date].png
       const f = state.filters || {};
       const locPart = (f.location && f.location !== 'all') ? f.location : 'all';
       const modePart = f.mode === 'today' ? 'today' : (f.mode === 'date' && f.date ? f.date : 'alltime');
       const today = new Date().toISOString().split('T')[0];
       const filename = `share-vault-${locPart}-${modePart}-${today}.png`;
 
-      // Resolve theme background colour so the export doesn't have a transparent BG
       const bgColor = getComputedStyle(document.body).backgroundColor || '#ffffff';
 
-      // Render to canvas at 2x for retina-quality screenshots
       const canvas = await html2canvas(target, {
         backgroundColor: bgColor,
         scale: 2,
         useCORS: true,
         logging: false,
-        // Hide the download button itself in the screenshot (no spinner in the image)
         ignoreElements: (el) => el.id === 'downloadBtn'
       });
 
-      // Trigger download
       canvas.toBlob((blob) => {
         if (!blob) throw new Error('Canvas conversion failed');
         const url = URL.createObjectURL(blob);
@@ -1333,12 +1396,36 @@ function updateProjections() {
   renderFunnel(totalFootfall, allNch, totalApplied, estIssued);
 }
 
+// Lightweight toast notification — used by sync button for live feedback
+function showToast(message, type, duration) {
+  const existing = document.getElementById('toast');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.id = 'toast';
+  toast.className = 'toast toast-' + (type || 'info');
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  requestAnimationFrame(() => toast.classList.add('toast-visible'));
+
+  if (duration && duration > 0) {
+    setTimeout(() => {
+      toast.classList.remove('toast-visible');
+      setTimeout(() => toast.remove(), 300);
+    }, duration);
+  }
+}
+
 async function fetchData() {
   try {
     if (CONFIG.API_URL.includes('PASTE_YOUR')) {
       throw new Error('API_URL not configured. Open this file in a text editor and set CONFIG.API_URL to your deployed Apps Script Web App URL.');
     }
-    const res = await fetch(CONFIG.API_URL);
+    // Cache-bust: timestamp + no-store so browser/CDN doesn't serve stale data
+    const separator = CONFIG.API_URL.includes('?') ? '&' : '?';
+    const url = CONFIG.API_URL + separator + '_t=' + Date.now();
+    const res = await fetch(url, { cache: 'no-store' });
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     state.raw = dedupeSourceData(data);
