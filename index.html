@@ -252,11 +252,20 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
 .span-rejection { grid-column: span 12; min-height: 460px; }
 .rejection-grid {
   display: grid;
-  grid-template-columns: 1.15fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 14px;
   margin-top: 4px;
 }
-@media (max-width: 1100px) { .rejection-grid { grid-template-columns: 1fr; } }
+.rej-exclusion-note {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 4px 0 10px;
+  padding: 6px 10px;
+  background: var(--card-tint);
+  border-radius: 8px;
+  display: inline-block;
+}
+@media (max-width: 900px) { .rejection-grid { grid-template-columns: 1fr; } }
 .rej-card {
   border: 1px solid var(--hairline);
   border-radius: var(--radius-md);
@@ -850,23 +859,35 @@ function render() {
 // Rules calibrated against real promoter comments in the NCH sheet.
 // =============================================================
 const REJECTION_RULES = [
-  // WARM LEADS (highest priority — these are the revenue opportunity)
+  // ==========================================================
+  // WARM LEADS — has a path back, worth chasing
+  // ==========================================================
   { bucket: 'warm', label: 'Business Owner / VIP', icon: '💼',
     keywords: ['business owner', 'businessowner', 'bussines owner', 'bussiness owner', 'has a business', 'has business', 'company holder', 'vip', 'entrepreneur', 'investor'] },
   { bucket: 'warm', label: 'Self-Employed', icon: '🧑‍💼',
     keywords: ['self employed', 'self-employed', 'swlf employed', 'selfemployed', 'self employ'] },
   { bucket: 'warm', label: 'Already Has Card (Upgrade)', icon: '💳',
     keywords: ['has 2 card', 'has 2 credit', 'titanium card', 'convert card', 'noon to share', 'wants to convert', 'already has', 'has a card'] },
+  { bucket: 'warm', label: 'Will Apply Later', icon: '⏰',
+    keywords: ['apply later', 'will apply', 'apply at home', 'register later', 'will do later', 'will register', 'think about it', 'come back', 'be back', 'will be back', 'do later', 'in rush', 'do by her self', 'do by him self', 'by herself', 'by himself', 'do at home', 'process at home', 'try later', 'will try', 'open later', 'do it later', 'check with family'] },
+  { bucket: 'warm', label: 'Contact Bank', icon: '☎️',
+    keywords: ['contact by bank', 'contact the bank', 'needs to be contacted', 'need to be contacted', 'contact by maf', 'maf team'] },
 
-  // PIPELINE (in flight — not rejections, just not yet completed)
-  { bucket: 'pipeline', label: 'Approved', icon: '✅',
+  // ==========================================================
+  // EXCLUDED — pipeline (filtered out, never shown)
+  // These rules exist only to CATCH and EXCLUDE these comments,
+  // so they don't fall into the "Other / Uncategorized" bucket.
+  // ==========================================================
+  { bucket: 'excluded', label: 'Approved', icon: '✅',
     keywords: ['approved', 'application done', 'app submitted', 'application submitted', 'card applied', 'application approved', 'card approved', 'platinum'] },
-  { bucket: 'pipeline', label: 'Under Review', icon: '🔄',
+  { bucket: 'excluded', label: 'Under Review', icon: '🔄',
     keywords: ['under review', 'under process', 'under progress', 'waiting for approval', 'waiting approval', 'application under', 'applied under review', 'applies under review', 'card under review', 'in process'] },
-  { bucket: 'pipeline', label: 'Influencer / Staff', icon: '⭐',
+  { bucket: 'excluded', label: 'Influencer / Staff', icon: '⭐',
     keywords: ['influencer entry', 'staff application', 'enbd staff', 'maf staff'] },
 
-  // GENUINE REJECTIONS
+  // ==========================================================
+  // OUTRIGHT REJECTED — no path forward
+  // ==========================================================
   { bucket: 'rejected', label: 'Rejected — Nationality', icon: '🌍',
     keywords: ['russian', 'restricted country', 'restricted nationality', 'because of restrictions', 'because of nationality', 'customer from russia', 'not eligible (russian', 'not eligible ( russian'] },
   { bucket: 'rejected', label: 'Rejected — Income / Salary', icon: '💰',
@@ -879,12 +900,8 @@ const REJECTION_RULES = [
     keywords: ['no bank account', 'no uae bank', 'does not have a uae bank', 'does not have any bank', 'new in the country', 'new to country', 'months left'] },
   { bucket: 'rejected', label: 'Technical / Docs Issue', icon: '⚙️',
     keywords: ['passport', 'otp', "couldn't apply", 'couldnt apply', "couldn't proceed", 'couldnt proceed', "couldn't upload", 'couldnt upload', 'system bug', 'linking the account', 'technical issue', 'application slow', "application couldn't", 'document not available', 'docs not available', "didn't process", "didn't proceed", 'unable to process', 'just loading', 'app issue', 'problem with share', 'problem linking', 'renewing id', 'will fix'] },
-  { bucket: 'rejected', label: 'Will Apply Later', icon: '⏰',
-    keywords: ['apply later', 'will apply', 'apply at home', 'register later', 'will do later', 'will register', 'think about it', 'come back', 'be back', 'will be back', 'do later', 'in rush', 'do by her self', 'do by him self', 'by herself', 'by himself', 'do at home', 'process at home', 'try later', 'will try', 'open later', 'do it later', 'check with family'] },
   { bucket: 'rejected', label: 'Not Interested', icon: '🚫',
     keywords: ['not interested', "doesn't want", 'doesnt want', 'does not want', 'not willing', 'did not want', 'didnt want', "didn't want", 'not  interested'] },
-  { bucket: 'rejected', label: 'Contact Bank', icon: '☎️',
-    keywords: ['contact by bank', 'contact the bank', 'needs to be contacted', 'need to be contacted', 'contact by maf', 'maf team'] },
   { bucket: 'rejected', label: 'Rejected — Other', icon: '❌',
     keywords: ['rejected', 'reject', 'not approved', 'not eligible', 'bank eligibility', 'eligibility criteria', 'eligibility issue', 'card rejected', 'application rejected'] }
 ];
@@ -904,31 +921,49 @@ function categorizeComment(rawComment) {
 function buildRejectionData(nonCardHolders) {
   const buckets = {
     warm: { rows: [], categories: {} },
-    rejected: { rows: [], categories: {} },
-    pipeline: { rows: [], categories: {} }
+    rejected: { rows: [], categories: {} }
   };
+  // Track what got filtered out (for honest header math)
+  const filtered = {
+    appliedY: 0,        // signed up — excluded entirely
+    inPipeline: 0,      // approved / under review / influencer / staff
+    noComment: 0        // blank comment, can't categorise
+  };
+
   for (const row of nonCardHolders) {
+    // Rule 1: if Applied = Y, they signed up. Exclude from analysis entirely.
+    const applied = String(row.applied || '').trim().toUpperCase();
+    if (applied === 'Y') { filtered.appliedY++; continue; }
+
     const comment = (row.comment || '').trim();
-    if (!comment) continue;
+    if (!comment) { filtered.noComment++; continue; }
+
     const rule = categorizeComment(comment);
-    if (!rule) continue;
+    if (!rule) { filtered.noComment++; continue; }
+
+    // Rule 2: pipeline/excluded bucket — keyword matched but we don't show these
+    if (rule.bucket === 'excluded') { filtered.inPipeline++; continue; }
+
     const b = buckets[rule.bucket];
     if (!b) continue;
     b.rows.push({ ...row, _category: rule.label, _icon: rule.icon });
     b.categories[rule.label] = (b.categories[rule.label] || 0) + 1;
   }
+
   for (const key of Object.keys(buckets)) {
     buckets[key].categoryList = Object.entries(buckets[key].categories)
       .map(([label, count]) => ({ label, count, icon: REJECTION_RULES.find(r => r.label === label)?.icon || '📝' }))
       .sort((a, b) => b.count - a.count);
     buckets[key].rows.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   }
+  buckets._filtered = filtered;
   return buckets;
 }
 
 function renderRejectionSection(nonCardHolders) {
   const data = buildRejectionData(nonCardHolders);
-  const totalCategorized = data.warm.rows.length + data.rejected.rows.length + data.pipeline.rows.length;
+  const totalShown = data.warm.rows.length + data.rejected.rows.length;
+  const filtered = data._filtered;
 
   const buildCategoryBars = (catList, bucketClass) => {
     if (!catList.length) return '<div class="rej-empty">No data yet</div>';
@@ -972,44 +1007,41 @@ function renderRejectionSection(nonCardHolders) {
   const rejectedList = data.rejected.rows.length
     ? data.rejected.rows.slice(0, 25).map(buildLeadCard).join('')
     : '<div class="rej-empty">No rejections captured yet</div>';
-  const pipelineList = data.pipeline.rows.length
-    ? data.pipeline.rows.slice(0, 25).map(buildLeadCard).join('')
-    : '<div class="rej-empty">No pipeline entries yet</div>';
+
+  // Honest math: total NCH = shown + applied=Y excluded + pipeline excluded + no comment
+  const excludedSummaryParts = [];
+  if (filtered.appliedY > 0) excludedSummaryParts.push(`${filtered.appliedY} signed up`);
+  if (filtered.inPipeline > 0) excludedSummaryParts.push(`${filtered.inPipeline} in pipeline`);
+  const excludedSummary = excludedSummaryParts.length
+    ? `<div class="rej-exclusion-note">Excluded from analysis: ${excludedSummaryParts.join(' · ')}</div>`
+    : '';
 
   return `
     <div class="chart-card span-rejection fade-in d4">
       <div class="section-head">
         <span><span class="label-soft">Why Not</span> Applied — Comments Analysis</span>
-        <span class="small-meta">${totalCategorized} categorised of ${nonCardHolders.length} NCH</span>
+        <span class="small-meta">${totalShown} categorised of ${nonCardHolders.length} NCH</span>
       </div>
+      ${excludedSummary}
 
       <div class="rejection-grid">
 
         <div class="rej-card rej-card-warm">
           <div class="rej-title"><span class="icon">🔥</span>Warm Leads</div>
           <div class="rej-count rej-count-warm">${data.warm.rows.length}</div>
-          <div class="rej-sub">Business owners, self-employed, upgrade candidates — needs CRM call</div>
+          <div class="rej-sub">Has a path back — business owners, self-employed, upgrade candidates, will-apply-laters. CRM target list.</div>
           <div class="rej-cat-list">${buildCategoryBars(data.warm.categoryList, 'warm')}</div>
           <div class="rej-leads-head">Contact List · scroll for all</div>
           <div class="rej-leads-list">${warmList}</div>
         </div>
 
         <div class="rej-card rej-card-rejected">
-          <div class="rej-title"><span class="icon">❌</span>Rejections</div>
+          <div class="rej-title"><span class="icon">❌</span>Outright Rejected</div>
           <div class="rej-count rej-count-rejected">${data.rejected.rows.length}</div>
-          <div class="rej-sub">Genuine no — eligibility, income, tech, not interested</div>
+          <div class="rej-sub">No path forward — eligibility, income, age, no UAE bank, not interested.</div>
           <div class="rej-cat-list">${buildCategoryBars(data.rejected.categoryList, 'rejected')}</div>
           <div class="rej-leads-head">Recent · top 25 shown</div>
           <div class="rej-leads-list">${rejectedList}</div>
-        </div>
-
-        <div class="rej-card rej-card-pipeline">
-          <div class="rej-title"><span class="icon">⏳</span>In Pipeline</div>
-          <div class="rej-count rej-count-pipeline">${data.pipeline.rows.length}</div>
-          <div class="rej-sub">Under review or approved — not a failure, track separately</div>
-          <div class="rej-cat-list">${buildCategoryBars(data.pipeline.categoryList, 'pipeline')}</div>
-          <div class="rej-leads-head">Recent · top 25 shown</div>
-          <div class="rej-leads-list">${pipelineList}</div>
         </div>
 
       </div>
