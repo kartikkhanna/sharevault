@@ -21,6 +21,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -626,6 +627,7 @@ function render() {
   const SUN_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
   const MOON_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
   const REFRESH_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.41-6.36L23 10"/><path d="M23 4v6h-6"/><path d="M21 12a9 9 0 0 1-15.41 6.36L1 14"/><path d="M1 20v-6h6"/></svg>`;
+  const DOWNLOAD_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
 
   const html = `
   <header class="header-band">
@@ -642,6 +644,7 @@ function render() {
           Data ${fmt.relativeTime(raw.dataLastUpdated || raw.generatedAt)}
         </div>
         <button class="icon-btn" id="refreshBtn" title="Refresh">${REFRESH_ICON}</button>
+        <button class="icon-btn" id="downloadBtn" title="Download as PNG">${DOWNLOAD_ICON}</button>
         <button class="icon-btn" id="themeBtn" title="Toggle theme">${state.theme === 'light' ? MOON_ICON : SUN_ICON}</button>
       </div>
     </div>
@@ -1213,6 +1216,61 @@ function attachHandlers() {
     const btn = document.getElementById('refreshBtn');
     btn.classList.add('spinning');
     fetchData().finally(() => { setTimeout(() => btn.classList.remove('spinning'), 500); });
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('downloadBtn');
+    if (btn.classList.contains('spinning')) return;  // already running
+
+    btn.classList.add('spinning');
+    btn.disabled = true;
+
+    try {
+      // Find the dashboard container — capture everything inside it
+      const target = document.querySelector('.dashboard') || document.body;
+
+      // Build a filter-aware filename: share-vault-[location]-[mode]-[date].png
+      const f = state.filters || {};
+      const locPart = (f.location && f.location !== 'all') ? f.location : 'all';
+      const modePart = f.mode === 'today' ? 'today' : (f.mode === 'date' && f.date ? f.date : 'alltime');
+      const today = new Date().toISOString().split('T')[0];
+      const filename = `share-vault-${locPart}-${modePart}-${today}.png`;
+
+      // Resolve theme background colour so the export doesn't have a transparent BG
+      const bgColor = getComputedStyle(document.body).backgroundColor || '#ffffff';
+
+      // Render to canvas at 2x for retina-quality screenshots
+      const canvas = await html2canvas(target, {
+        backgroundColor: bgColor,
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        // Hide the download button itself in the screenshot (no spinner in the image)
+        ignoreElements: (el) => el.id === 'downloadBtn'
+      });
+
+      // Trigger download
+      canvas.toBlob((blob) => {
+        if (!blob) throw new Error('Canvas conversion failed');
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }, 'image/png');
+
+    } catch (err) {
+      console.error('Download failed:', err);
+      alert('Could not generate download. Try again or take a manual screenshot.\n\n' + err.message);
+    } finally {
+      setTimeout(() => {
+        btn.classList.remove('spinning');
+        btn.disabled = false;
+      }, 600);
+    }
   });
 
   document.getElementById('modeSegment').querySelectorAll('button').forEach(b => {
