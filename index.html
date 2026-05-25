@@ -477,31 +477,33 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
   height: 22px;
   background: var(--card-tint);
   border-radius: 11px;
-  overflow: visible;
+  overflow: hidden;       /* clip everything to the track */
 }
 .forecast-bar-fill {
   position: absolute;
   top: 0; bottom: 0;
   height: 22px;
-  border-radius: 11px;
   transition: width 400ms ease, left 400ms ease;
 }
-.forecast-bar-fill.confirmed { background: var(--pink); left: 0; z-index: 3; }
+.forecast-bar-fill.confirmed { background: var(--pink); left: 0; z-index: 3; border-radius: 11px 0 0 11px; }
 .forecast-bar-fill.projected { background: var(--pink-soft); opacity: 0.5; z-index: 2; }
-.forecast-bar-fill.overflow { background: var(--danger); opacity: 0.7; z-index: 1; border-radius: 0 11px 11px 0; }
-.forecast-bar-ceiling {
+.forecast-bar-fill.projected.projected-over { background: var(--danger); opacity: 0.4; }
+.forecast-bar-target-marker {
   position: absolute;
-  right: 0; top: -4px; bottom: -4px;
+  top: -4px; bottom: -4px;
   width: 2px;
   background: var(--ink);
   z-index: 4;
+  pointer-events: none;
 }
-.forecast-bar-ceiling::after {
-  content: 'Target';
+.forecast-bar-target-marker::after {
+  content: 'TARGET';
   position: absolute;
-  top: -18px; right: -18px;
-  font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
+  top: -16px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px; font-weight: 700; letter-spacing: 0.08em;
   color: var(--ink); text-transform: uppercase;
+  white-space: nowrap;
 }
 .forecast-bar-labels {
   display: flex;
@@ -1377,12 +1379,24 @@ function renderForecastSection(forecast, levers, activeLevers, raw, approvalRate
 
       <!-- Headline Bar -->
       <div class="forecast-bar-wrap">
-        <div class="forecast-bar-track">
-          <div class="forecast-bar-fill confirmed" style="width:${currentBarPct}%" title="Spent so far: AED ${fmt.num(forecast.totalCurrent)}"></div>
-          <div class="forecast-bar-fill projected" style="left:${currentBarPct}%; width:${Math.max(0, projectedBarPct - currentBarPct)}%" title="Forecast to add: AED ${fmt.num(projectedAfterLevers - forecast.totalCurrent)}"></div>
-          ${overflowPct > 0 ? `<div class="forecast-bar-fill overflow" style="left:100%; width:${overflowPct}%"></div>` : ''}
-          <div class="forecast-bar-ceiling"></div>
-        </div>
+        ${(() => {
+          // Scale bar to max(projected, target) so it always fits.
+          // Confirmed fill % = confirmed / scaleMax
+          // Projected fill % = projected / scaleMax
+          // Target marker pos % = target / scaleMax
+          const scaleMax = Math.max(projectedAfterLevers, ceiling);
+          const confirmedPct = scaleMax > 0 ? (forecast.totalCurrent / scaleMax) * 100 : 0;
+          const projectedPct = scaleMax > 0 ? (projectedAfterLevers / scaleMax) * 100 : 0;
+          const targetMarkerPct = scaleMax > 0 ? (ceiling / scaleMax) * 100 : 100;
+          const isProjOver = projectedAfterLevers > ceiling;
+          return `
+            <div class="forecast-bar-track">
+              <div class="forecast-bar-fill confirmed" style="width:${confirmedPct}%" title="Spent so far: AED ${fmt.num(forecast.totalCurrent)}"></div>
+              <div class="forecast-bar-fill projected ${isProjOver ? 'projected-over' : ''}" style="left:${confirmedPct}%; width:${Math.max(0, projectedPct - confirmedPct)}%" title="Forecast to add: AED ${fmt.num(projectedAfterLevers - forecast.totalCurrent)}"></div>
+              <div class="forecast-bar-target-marker" style="left:${targetMarkerPct}%"></div>
+            </div>
+          `;
+        })()}
         <div class="forecast-bar-labels">
           <div class="bar-label-left">
             <span class="dot confirmed-dot"></span>Confirmed <strong>AED ${fmt.num(forecast.totalCurrent)}</strong>
@@ -1555,11 +1569,11 @@ function render() {
       <div class="brand-block">
         <div class="title-stack">
           <div class="title">The Vault</div>
-          <div class="subtitle">Real-time performance report</div>
+          <div class="subtitle">Real-time performance read-out · Emirates NBD × Visa × Majid Al Futtaim</div>
         </div>
       </div>
       <div class="meta-block">
-        <div class="partners">ENBD · SHARE · Visa</div>
+        <div class="partners">ENBD · Visa · MAF</div>
         <div class="timestamp" title="Exact: ${fmt.timestamp(raw.dataLastUpdated || raw.generatedAt)}${raw.dataLastUpdated ? '' : ' (sheet timestamp not available — showing page fetch time)'}">
           Data ${fmt.relativeTime(raw.dataLastUpdated || raw.generatedAt)}
         </div>
@@ -1615,7 +1629,7 @@ function render() {
         <div class="kpi-card">
           <div class="kpi-label">Card Holders</div>
           <div class="kpi-value">${fmt.num(m.cardHolders)}</div>
-          <div class="kpi-sub"></div>
+          <div class="kpi-sub">SHARE Visa verified</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Non-Cardholders</div>
