@@ -341,6 +341,131 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
 }
 .rej-empty { text-align: center; color: var(--muted); font-size: 11px; padding: 20px 0; font-style: italic; }
 
+/* =========================================================
+   BUDGET UTILISATION
+   ========================================================= */
+.span-budget { grid-column: span 12; min-height: 460px; }
+
+.budget-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 14px;
+}
+@media (max-width: 900px) { .budget-summary { grid-template-columns: 1fr; } }
+
+.budget-summary-card {
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--hairline);
+  background: var(--card-tint);
+}
+.budget-summary-card.confirmed { background: linear-gradient(180deg, #fff5fa 0%, #ffffff 100%); border-color: #f5c8de; }
+.budget-summary-card.contingent { background: linear-gradient(180deg, #fffaf0 0%, #ffffff 100%); border-color: #f0d8b0; }
+.budget-summary-card.partner { background: linear-gradient(180deg, #f6f7fb 0%, #ffffff 100%); border-color: #d8dce8; }
+[data-theme="dark"] .budget-summary-card.confirmed { background: linear-gradient(180deg, rgba(230,0,126,0.08) 0%, rgba(255,255,255,0.02) 100%); border-color: rgba(230,0,126,0.3); }
+[data-theme="dark"] .budget-summary-card.contingent { background: linear-gradient(180deg, rgba(199,126,0,0.08) 0%, rgba(255,255,255,0.02) 100%); border-color: rgba(199,126,0,0.3); }
+[data-theme="dark"] .budget-summary-card.partner { background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%); border-color: rgba(255,255,255,0.08); }
+
+.budget-summary-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--slate); display: flex; align-items: center; gap: 6px;
+}
+.budget-summary-label .lock-icon { font-size: 11px; }
+.budget-summary-value { font-size: 26px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; line-height: 1.1; margin: 4px 0 2px; }
+.budget-summary-card.confirmed .budget-summary-value { color: var(--pink); }
+.budget-summary-card.contingent .budget-summary-value { color: var(--warn); }
+.budget-summary-sub { font-size: 11px; color: var(--slate); font-weight: 500; }
+.budget-summary-detail { font-size: 10px; color: var(--muted); margin-top: 4px; font-style: italic; }
+
+.budget-exposure-row {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding: 10px 14px;
+  background: var(--card-tint);
+  border-radius: var(--radius-sm);
+  margin-bottom: 14px;
+  font-size: 11.5px;
+}
+.budget-exposure-row strong { color: var(--ink); font-weight: 700; }
+.budget-exposure-row .exposure-divider { color: var(--muted); }
+.budget-exposure-row .total-spend { color: var(--pink); font-weight: 700; font-size: 13px; }
+
+.budget-slider-row {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 11px; color: var(--slate);
+  padding: 10px 14px;
+  background: var(--card-tint);
+  border-radius: var(--radius-sm);
+  margin-bottom: 14px;
+}
+.budget-slider-label { font-weight: 600; min-width: 200px; }
+@media (max-width: 700px) { .budget-slider-label { min-width: auto; } }
+
+.budget-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+@media (max-width: 900px) { .budget-grid { grid-template-columns: 1fr; } }
+
+.budget-card {
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+}
+.budget-card-confirmed { background: linear-gradient(180deg, #fff5fa 0%, #ffffff 100%); border-color: #f5c8de; }
+.budget-card-contingent { background: linear-gradient(180deg, #fffaf0 0%, #ffffff 100%); border-color: #f0d8b0; }
+.budget-card-partner { background: linear-gradient(180deg, #f6f7fb 0%, #ffffff 100%); border-color: #d8dce8; }
+[data-theme="dark"] .budget-card-confirmed { background: linear-gradient(180deg, rgba(230,0,126,0.08) 0%, rgba(255,255,255,0.02) 100%); border-color: rgba(230,0,126,0.3); }
+[data-theme="dark"] .budget-card-contingent { background: linear-gradient(180deg, rgba(199,126,0,0.08) 0%, rgba(255,255,255,0.02) 100%); border-color: rgba(199,126,0,0.3); }
+[data-theme="dark"] .budget-card-partner { background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%); border-color: rgba(255,255,255,0.08); }
+
+.budget-card-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.budget-card-title .icon { margin-right: 6px; font-size: 14px; }
+.budget-card-sub { font-size: 10.5px; color: var(--slate); margin-bottom: 14px; line-height: 1.35; font-weight: 500; }
+
+.budget-rows { display: flex; flex-direction: column; gap: 8px; }
+.budget-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(60px, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+}
+.budget-row-label { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.budget-row-name { color: var(--ink-soft); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.budget-note { font-size: 9.5px; color: var(--muted); font-style: italic; }
+.budget-row-bar { height: 4px; background: var(--hairline); border-radius: 2px; overflow: hidden; }
+.budget-row-bar-fill { height: 100%; border-radius: 2px; transition: width 400ms ease; }
+.budget-row-bar-fill.confirmed { background: linear-gradient(90deg, var(--pink), #ff4ba8); }
+.budget-row-bar-fill.contingent { background: linear-gradient(90deg, var(--warn), #f0c060); }
+.budget-row-bar-fill.partner { background: linear-gradient(90deg, #6b6b8a, #9a9ab8); }
+.budget-row-meta { display: flex; gap: 8px; align-items: baseline; font-variant-numeric: tabular-nums; }
+.budget-row-cost { font-weight: 700; color: var(--ink); font-size: 11px; }
+.budget-row-count { font-size: 10px; color: var(--muted); min-width: 28px; text-align: right; }
+.budget-empty { text-align: center; color: var(--muted); font-size: 11px; padding: 16px 0; font-style: italic; }
+
+.budget-partner-wide {
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  background: linear-gradient(180deg, #f6f7fb 0%, #ffffff 100%);
+  border-color: #d8dce8;
+}
+[data-theme="dark"] .budget-partner-wide { background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%); border-color: rgba(255,255,255,0.08); }
+
+.budget-unmatched {
+  margin-top: 14px;
+  padding: 8px 12px;
+  background: rgba(199, 126, 0, 0.08);
+  border: 1px solid rgba(199, 126, 0, 0.2);
+  border-radius: 8px;
+  color: var(--warn);
+  font-size: 10.5px;
+  font-weight: 500;
+}
+
 .loading { min-height: 70vh; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
 .loading-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--pink); animation: pulse 1400ms ease-in-out infinite; }
 .loading-label { font-size: 11px; font-weight: 600; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; }
@@ -359,6 +484,7 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
 .fade-in.d2 { animation-delay: 80ms; }
 .fade-in.d3 { animation-delay: 120ms; }
 .fade-in.d4 { animation-delay: 160ms; }
+.fade-in.d5 { animation-delay: 200ms; }
 
 /* Toast notification — used by Sync Now button */
 .toast {
@@ -412,7 +538,7 @@ const CONFIG = {
 const state = {
   raw: null,
   filters: { mode: 'all', date: null, location: 'all' },
-  rates: { signup: 0.15, lead: 0.30 },
+  rates: { signup: 0.15, lead: 0.30, approval: 0.10 },
   theme: 'light',
   charts: {}
 };
@@ -623,6 +749,262 @@ function prizeSplit(filtered) {
   })).sort((a, b) => b.count - a.count);
 }
 
+// =============================================================
+// BUDGET — Prize cost catalog
+// =============================================================
+// SHARE-funded: SHARE Points, Noor Box (both for CH and NCH)
+// Mall Gift Card: AED 50, given on sign-up (Applied=Y), regardless of approval
+// Partner-funded: Everything else (Gold = ENBD, Carrefour, tenant brands, entertainment)
+const PRIZE_COSTS = [
+  // SHARE-FUNDED PRIZES
+  { funder: 'share', label: 'SHARE Points (AED 100)', match: /aed 100.*share points|share points.*aed 100|aed 100 in share/i, cost: 100 },
+  { funder: 'share', label: 'SHARE Points (AED 250)', match: /aed 250.*share points|share points.*aed 250|aed 250 in share/i, cost: 250 },
+  { funder: 'share', label: 'SHARE Points (AED 500)', match: /aed 500.*share points|share points.*aed 500|aed 500 in share/i, cost: 500 },
+  { funder: 'share', label: 'SHARE Points (AED 1,000)', match: /aed 1,?000.*share points|share points.*aed 1,?000|aed 1,?000 in share/i, cost: 1000 },
+  { funder: 'share', label: 'SHARE Points (AED 2,500)', match: /aed 2,?500.*share points|share points.*aed 2,?500|aed 2,?500 in share/i, cost: 2500 },
+  { funder: 'share', label: 'Noor Box', match: /noor box/i, cost: 1300 },
+
+  // PARTNER-FUNDED — ENBD
+  { funder: 'partner', partner: 'ENBD', label: 'Gold Coin (10g)', match: /gold coin \(10g\)|10g gold/i, cost: 5000 },
+  { funder: 'partner', partner: 'ENBD', label: 'Gold Coin (5g)', match: /gold coin \(5g\)|5g gold/i, cost: 2500 },
+
+  // PARTNER-FUNDED — Carrefour
+  { funder: 'partner', partner: 'Carrefour', label: 'Acer Aspire Lite Laptop', match: /acer aspire/i, cost: 1599 },
+  { funder: 'partner', partner: 'Carrefour', label: 'Lenovo IdeaPad 3', match: /lenovo ideapad/i, cost: 1599 },
+  { funder: 'partner', partner: 'Carrefour', label: 'Asus 14" Laptop (i5)', match: /asus.*i5/i, cost: 2699 },
+  { funder: 'partner', partner: 'Carrefour', label: 'Asus 14" Laptop (R5)', match: /asus.*r5|asus r5/i, cost: 2299 },
+  { funder: 'partner', partner: 'Carrefour', label: 'Samsung A26', match: /samsung a26/i, cost: 999 },
+  { funder: 'partner', partner: 'Carrefour', label: 'Bissell Stick Vacuum', match: /bissell.*stick|bissell.*furguard/i, cost: 1139 },
+  { funder: 'partner', partner: 'Carrefour', label: 'Bissell SpotClean', match: /bissell.*spotclean|bissell.*hydrosteam/i, cost: 1138 },
+  { funder: 'partner', partner: 'Carrefour', label: 'Bissell Wet & Dry', match: /bissell.*wet.*dry|bissell.*omniforce/i, cost: 1664 },
+  { funder: 'partner', partner: 'Carrefour', label: 'Nespresso Essenza', match: /nespresso/i, cost: 749 },
+  { funder: 'partner', partner: 'Carrefour', label: 'Philips TV 55"', match: /philips.*tv|55put/i, cost: 1499 },
+  { funder: 'partner', partner: 'Carrefour', label: 'Party Speaker', match: /party speaker/i, cost: 1139 },
+
+  // PARTNER-FUNDED — Tenants & Brands
+  { funder: 'partner', partner: 'Lululemon', label: 'Lululemon Voucher', match: /lululemon/i, cost: 500 },
+  { funder: 'partner', partner: 'Psycho Bunny', label: 'Psycho Bunny Voucher', match: /psycho bunny/i, cost: 500 },
+  { funder: 'partner', partner: 'AllSaints', label: 'AllSaints Voucher', match: /allsaints/i, cost: 350 },
+  { funder: 'partner', partner: 'Crate & Barrel', label: 'Crate & Barrel Voucher', match: /crate.*barrel/i, cost: 800 },
+  { funder: 'partner', partner: 'CB2', label: 'CB2 Voucher', match: /\bcb2\b/i, cost: 800 },
+  { funder: 'partner', partner: 'Kiehl\'s', label: 'Kiehl\'s Travel Pack', match: /kiehl/i, cost: 500 },
+  { funder: 'partner', partner: 'Shiseido', label: 'Shiseido BOGO', match: /shiseido/i, cost: 500 },
+  { funder: 'partner', partner: 'LEGO', label: 'LEGO Duck Set', match: /lego/i, cost: 700 },
+  { funder: 'partner', partner: 'Michael Kors', label: 'Michael Kors Voucher', match: /michael kors|25% off/i, cost: 500 },
+  { funder: 'partner', partner: '1847', label: '1847 AED 500 Voucher', match: /1847.*500|aed 500.*1847/i, cost: 500 },
+  { funder: 'partner', partner: '1847', label: '1847 AED 50 Off', match: /1847.*50|aed 50.*off.*1847|1847 voucher/i, cost: 50 },
+  { funder: 'partner', partner: 'N.bar', label: 'N.bar Voucher', match: /n\.bar|nbar/i, cost: 500 },
+  { funder: 'partner', partner: 'K LYN', label: 'K LYN Voucher', match: /k lyn|klyn/i, cost: 500 },
+
+  // PARTNER-FUNDED — Entertainment
+  { funder: 'partner', partner: 'VOX Cinemas', label: 'VOX Tickets', match: /vox|theater tickets|cinema/i, cost: 1000 },
+  { funder: 'partner', partner: 'Ski Dubai', label: 'Ski Dubai Snow Park', match: /snow park|ski dubai.*park/i, cost: 249 },
+  { funder: 'partner', partner: 'Ski Dubai', label: 'Ski Dubai Penguin', match: /penguin/i, cost: 698 },
+  { funder: 'partner', partner: 'Magic Planet', label: 'Magic Planet Card', match: /magic planet|10 free games/i, cost: 100 },
+  { funder: 'partner', partner: 'Magic Planet', label: 'SOCO Card', match: /soco/i, cost: 100 },
+  { funder: 'partner', partner: 'iFLY', label: 'iFLY Flight', match: /ifly|i fly|standard flight/i, cost: 179 }
+];
+
+function lookupPrizeCost(prizeStr) {
+  if (!prizeStr) return null;
+  const s = String(prizeStr).trim();
+  if (!s) return null;
+  for (const rule of PRIZE_COSTS) {
+    if (rule.match.test(s)) return rule;
+  }
+  return null;
+}
+
+// Compute the three-bucket budget split
+// CONFIRMED = everything CH gets (SHARE Points + Noor Box for CH) + Mall Gift Cards (Applied=Y × 50)
+// CONTINGENT = everything NCH gets that is SHARE-funded (SHARE Points + Noor Box for NCH) × approval rate
+// PARTNER = everything partner-funded (both CH and NCH) — informational
+function computeBudget(filtered, approvalRate) {
+  const confirmed = { total: 0, breakdown: {}, count: 0 };
+  const contingent = { total: 0, breakdown: {}, fullPotential: 0, count: 0 };
+  const partner = { total: 0, breakdown: {}, count: 0 };
+  let unmatched = { count: 0, samples: [] };
+
+  // Process Card Holder prizes
+  for (const row of filtered.cardHolders) {
+    if (!row.prize || !String(row.prize).trim()) continue;
+    const match = lookupPrizeCost(row.prize);
+    if (!match) {
+      unmatched.count++;
+      if (unmatched.samples.length < 5) unmatched.samples.push(`CH: "${row.prize}"`);
+      continue;
+    }
+    if (match.funder === 'share') {
+      // CH SHARE prizes = confirmed
+      confirmed.total += match.cost;
+      confirmed.count++;
+      const key = match.label;
+      if (!confirmed.breakdown[key]) confirmed.breakdown[key] = { cost: 0, count: 0 };
+      confirmed.breakdown[key].cost += match.cost;
+      confirmed.breakdown[key].count++;
+    } else {
+      // CH partner prizes = partner-funded
+      partner.total += match.cost;
+      partner.count++;
+      const key = `${match.partner} — ${match.label}`;
+      if (!partner.breakdown[key]) partner.breakdown[key] = { cost: 0, count: 0 };
+      partner.breakdown[key].cost += match.cost;
+      partner.breakdown[key].count++;
+    }
+  }
+
+  // Process Non-Cardholder prizes
+  for (const row of filtered.nonCardHolders) {
+    if (!row.prize || !String(row.prize).trim()) continue;
+    const match = lookupPrizeCost(row.prize);
+    if (!match) {
+      unmatched.count++;
+      if (unmatched.samples.length < 5) unmatched.samples.push(`NCH: "${row.prize}"`);
+      continue;
+    }
+    if (match.funder === 'share') {
+      // NCH SHARE prizes = contingent (only realised on approval)
+      contingent.fullPotential += match.cost;
+      contingent.count++;
+      const key = match.label;
+      if (!contingent.breakdown[key]) contingent.breakdown[key] = { fullCost: 0, count: 0 };
+      contingent.breakdown[key].fullCost += match.cost;
+      contingent.breakdown[key].count++;
+    } else {
+      partner.total += match.cost;
+      partner.count++;
+      const key = `${match.partner} — ${match.label}`;
+      if (!partner.breakdown[key]) partner.breakdown[key] = { cost: 0, count: 0 };
+      partner.breakdown[key].cost += match.cost;
+      partner.breakdown[key].count++;
+    }
+  }
+
+  // Apply approval rate to contingent
+  contingent.total = Math.round(contingent.fullPotential * approvalRate);
+  // Build expected-cost view per category
+  for (const key of Object.keys(contingent.breakdown)) {
+    contingent.breakdown[key].cost = Math.round(contingent.breakdown[key].fullCost * approvalRate);
+  }
+
+  // Mall Gift Cards: AED 50 per Applied=Y, regardless of approval — goes into CONFIRMED
+  const appliedCount = filtered.nonCardHolders.filter(r => r.applied === 'Y').length;
+  const giftCardCost = appliedCount * 50;
+  if (giftCardCost > 0) {
+    confirmed.total += giftCardCost;
+    confirmed.breakdown['Mall Gift Card (AED 50)'] = {
+      cost: giftCardCost,
+      count: appliedCount,
+      note: `${appliedCount} sign-ups × AED 50`
+    };
+  }
+
+  return { confirmed, contingent, partner, unmatched, appliedCount };
+}
+
+function renderBudgetSection(budget, approvalRate) {
+  const confirmedTotal = budget.confirmed.total;
+  const contingentExpected = budget.contingent.total;
+  const contingentFull = budget.contingent.fullPotential;
+  const partnerTotal = budget.partner.total;
+  const shareExpected = confirmedTotal + contingentExpected;
+  const shareWorstCase = confirmedTotal + contingentFull;
+
+  const buildBreakdown = (breakdown, bucketClass) => {
+    const sorted = Object.entries(breakdown).sort((a, b) => b[1].cost - a[1].cost);
+    if (!sorted.length) return '<div class="budget-empty">No prizes awarded yet</div>';
+    const max = Math.max(...sorted.map(([_, v]) => v.cost));
+    return sorted.map(([label, v]) => {
+      const pct = max > 0 ? (v.cost / max) * 100 : 0;
+      const note = v.note ? `<span class="budget-note">${v.note}</span>` : '';
+      return `
+        <div class="budget-row">
+          <div class="budget-row-label">
+            <span class="budget-row-name">${label}</span>
+            ${note}
+          </div>
+          <div class="budget-row-bar"><div class="budget-row-bar-fill ${bucketClass}" style="width:${pct}%"></div></div>
+          <div class="budget-row-meta">
+            <span class="budget-row-cost">AED ${fmt.num(v.cost)}</span>
+            <span class="budget-row-count">${v.count}×</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  };
+
+  return `
+    <div class="chart-card span-budget fade-in d5">
+      <div class="section-head">
+        <span><span class="label-soft">Budget</span> Utilisation</span>
+        <span class="small-meta">SHARE Expected: <span style="color: var(--pink); font-weight: 700;">AED ${fmt.num(shareExpected)}</span></span>
+      </div>
+
+      <div class="budget-summary">
+        <div class="budget-summary-card confirmed">
+          <div class="budget-summary-label">🔒 Confirmed Spend</div>
+          <div class="budget-summary-value">AED ${fmt.num(confirmedTotal)}</div>
+          <div class="budget-summary-sub">${budget.confirmed.count} CH prizes + ${budget.appliedCount} gift cards</div>
+          <div class="budget-summary-detail">Already incurred — non-negotiable</div>
+        </div>
+        <div class="budget-summary-card contingent">
+          <div class="budget-summary-label">⏳ Contingent (Expected)</div>
+          <div class="budget-summary-value">AED ${fmt.num(contingentExpected)}</div>
+          <div class="budget-summary-sub">${budget.contingent.count} NCH prizes × <span id="approvalRateInline" style="color: var(--warn); font-weight: 700;">${fmt.pct(approvalRate)}</span> approval</div>
+          <div class="budget-summary-detail">Worst case @100%: AED ${fmt.num(contingentFull)}</div>
+        </div>
+        <div class="budget-summary-card partner">
+          <div class="budget-summary-label">🤝 Partner-Funded</div>
+          <div class="budget-summary-value">AED ${fmt.num(partnerTotal)}</div>
+          <div class="budget-summary-sub">${budget.partner.count} prizes · informational</div>
+          <div class="budget-summary-detail">ENBD · Carrefour · tenants · entertainment</div>
+        </div>
+      </div>
+
+      <div class="budget-exposure-row">
+        <strong>SHARE Expected:</strong> <span class="total-spend">AED ${fmt.num(shareExpected)}</span>
+        <span class="exposure-divider">·</span>
+        <strong>SHARE Worst Case (100% approval):</strong> AED ${fmt.num(shareWorstCase)}
+        <span class="exposure-divider">·</span>
+        <strong>Total Across All Funders:</strong> AED ${fmt.num(shareExpected + partnerTotal)}
+      </div>
+
+      <div class="budget-slider-row">
+        <span class="budget-slider-label">Approval rate assumption</span>
+        <input type="range" class="rate-slider" id="approvalSlider" min="0" max="100" value="${approvalRate*100}" step="1" style="flex: 1;" />
+        <span style="font-weight: 700; color: var(--warn); min-width: 50px; text-align: right;" id="approvalRateLabel">${fmt.pct(approvalRate)}</span>
+      </div>
+
+      <div class="budget-grid">
+        <div class="budget-card budget-card-confirmed">
+          <div class="budget-card-title"><span class="icon">🔒</span>Confirmed Breakdown</div>
+          <div class="budget-card-sub">SHARE Points + Noor Box given to Card Holders · AED 50 Mall Gift Cards on sign-up</div>
+          <div class="budget-rows">${buildBreakdown(budget.confirmed.breakdown, 'confirmed')}</div>
+        </div>
+        <div class="budget-card budget-card-contingent">
+          <div class="budget-card-title"><span class="icon">⏳</span>Contingent Breakdown (NCH @ ${fmt.pct(approvalRate)})</div>
+          <div class="budget-card-sub">SHARE Points + Noor Box earmarked for Non-Cardholders — only realised on card approval</div>
+          <div class="budget-rows">${buildBreakdown(budget.contingent.breakdown, 'contingent')}</div>
+        </div>
+      </div>
+
+      <div class="budget-partner-wide">
+        <div class="budget-card-title"><span class="icon">🤝</span>Partner-Funded Breakdown</div>
+        <div class="budget-card-sub">ENBD gold · Carrefour electronics · tenant brands · entertainment partners — not SHARE budget</div>
+        <div class="budget-rows" style="margin-top: 10px;">${buildBreakdown(budget.partner.breakdown, 'partner')}</div>
+      </div>
+
+      ${budget.unmatched.count > 0 ? `
+        <div class="budget-unmatched">
+          ⚠ ${budget.unmatched.count} prize${budget.unmatched.count > 1 ? 's' : ''} couldn't be matched to cost table — not counted in totals.
+          ${budget.unmatched.samples.length ? `Samples: ${budget.unmatched.samples.slice(0, 3).join(', ')}` : ''}
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+
 function render() {
   const raw = state.raw;
   if (!raw) return;
@@ -647,6 +1029,8 @@ function render() {
   const avgDailyFootfall = totalFootfall / daysSinceStart;
   const projectedFootfall = Math.round(totalFootfall + (avgDailyFootfall * daysRemaining));
   const estCardsIssued = Math.round(totalApplied * state.rates.lead);
+
+  const budget = computeBudget(filtered, state.rates.approval);
 
   const dq = raw.dataQuality || {};
 
@@ -871,6 +1255,8 @@ function render() {
 
       ${renderRejectionSection(filtered.nonCardHolders)}
 
+      ${renderBudgetSection(budget, state.rates.approval)}
+
     </div>
   </div>
   `;
@@ -888,9 +1274,6 @@ function render() {
 // Rules calibrated against real promoter comments in the NCH sheet.
 // =============================================================
 const REJECTION_RULES = [
-  // ==========================================================
-  // WARM LEADS — has a path back, worth chasing
-  // ==========================================================
   { bucket: 'warm', label: 'Business Owner / VIP', icon: '💼',
     keywords: ['business owner', 'businessowner', 'bussines owner', 'bussiness owner', 'has a business', 'has business', 'company holder', 'vip', 'entrepreneur', 'investor'] },
   { bucket: 'warm', label: 'Self-Employed', icon: '🧑‍💼',
@@ -902,11 +1285,6 @@ const REJECTION_RULES = [
   { bucket: 'warm', label: 'Contact Bank', icon: '☎️',
     keywords: ['contact by bank', 'contact the bank', 'needs to be contacted', 'need to be contacted', 'contact by maf', 'maf team'] },
 
-  // ==========================================================
-  // EXCLUDED — pipeline (filtered out, never shown)
-  // These rules exist only to CATCH and EXCLUDE these comments,
-  // so they don't fall into the "Other / Uncategorized" bucket.
-  // ==========================================================
   { bucket: 'excluded', label: 'Approved', icon: '✅',
     keywords: ['approved', 'application done', 'app submitted', 'application submitted', 'card applied', 'application approved', 'card approved', 'platinum'] },
   { bucket: 'excluded', label: 'Under Review', icon: '🔄',
@@ -914,9 +1292,6 @@ const REJECTION_RULES = [
   { bucket: 'excluded', label: 'Influencer / Staff', icon: '⭐',
     keywords: ['influencer entry', 'staff application', 'enbd staff', 'maf staff'] },
 
-  // ==========================================================
-  // OUTRIGHT REJECTED — no path forward
-  // ==========================================================
   { bucket: 'rejected', label: 'Rejected — Nationality', icon: '🌍',
     keywords: ['russian', 'restricted country', 'restricted nationality', 'because of restrictions', 'because of nationality', 'customer from russia', 'not eligible (russian', 'not eligible ( russian'] },
   { bucket: 'rejected', label: 'Rejected — Income / Salary', icon: '💰',
@@ -952,15 +1327,13 @@ function buildRejectionData(nonCardHolders) {
     warm: { rows: [], categories: {} },
     rejected: { rows: [], categories: {} }
   };
-  // Track what got filtered out (for honest header math)
   const filtered = {
-    appliedY: 0,        // signed up — excluded entirely
-    inPipeline: 0,      // approved / under review / influencer / staff
-    noComment: 0        // blank comment, can't categorise
+    appliedY: 0,
+    inPipeline: 0,
+    noComment: 0
   };
 
   for (const row of nonCardHolders) {
-    // Rule 1: if Applied = Y, they signed up. Exclude from analysis entirely.
     const applied = String(row.applied || '').trim().toUpperCase();
     if (applied === 'Y') { filtered.appliedY++; continue; }
 
@@ -970,7 +1343,6 @@ function buildRejectionData(nonCardHolders) {
     const rule = categorizeComment(comment);
     if (!rule) { filtered.noComment++; continue; }
 
-    // Rule 2: pipeline/excluded bucket — keyword matched but we don't show these
     if (rule.bucket === 'excluded') { filtered.inPipeline++; continue; }
 
     const b = buckets[rule.bucket];
@@ -1037,7 +1409,6 @@ function renderRejectionSection(nonCardHolders) {
     ? data.rejected.rows.slice(0, 25).map(buildLeadCard).join('')
     : '<div class="rej-empty">No rejections captured yet</div>';
 
-  // Honest math: total NCH = shown + applied=Y excluded + pipeline excluded + no comment
   const excludedSummaryParts = [];
   if (filtered.appliedY > 0) excludedSummaryParts.push(`${filtered.appliedY} signed up`);
   if (filtered.inPipeline > 0) excludedSummaryParts.push(`${filtered.inPipeline} in pipeline`);
@@ -1245,8 +1616,7 @@ function attachHandlers() {
     btn.classList.add('spinning');
     btn.disabled = true;
 
-    // Show toast — sync can take 15-30s, user needs feedback
-    showToast('Pulling latest from agency xlsx…', 'info', 0);  // 0 = no auto-hide
+    showToast('Pulling latest from agency xlsx…', 'info', 0);
 
     try {
       const separator = CONFIG.API_URL.includes('?') ? '&' : '?';
@@ -1264,7 +1634,6 @@ function attachHandlers() {
         : `Already up to date · ${elapsed}s`;
       showToast(msg, 'success', 3000);
 
-      // Refetch dashboard data so new rows appear
       await fetchData();
 
     } catch (err) {
@@ -1321,6 +1690,36 @@ function attachHandlers() {
       const inlineEl = document.getElementById('leadRateInline');
       if (inlineEl) inlineEl.textContent = fmt.pct(state.rates.lead);
       updateProjections();
+    });
+  }
+  // Approval slider — re-render budget section only (not full dashboard) to preserve slider focus
+  const approvalSlider = document.getElementById('approvalSlider');
+  if (approvalSlider) {
+    approvalSlider.addEventListener('input', e => {
+      state.rates.approval = parseInt(e.target.value) / 100;
+      document.getElementById('approvalRateLabel').textContent = fmt.pct(state.rates.approval);
+      updateBudgetSection();
+    });
+  }
+}
+
+// Patch in only the budget section (used when approval slider moves)
+function updateBudgetSection() {
+  if (!state.raw) return;
+  const filtered = applyFilters(state.raw, state.filters);
+  const budget = computeBudget(filtered, state.rates.approval);
+  const existing = document.querySelector('.span-budget');
+  if (!existing) return;
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = renderBudgetSection(budget, state.rates.approval);
+  existing.replaceWith(wrapper.firstElementChild);
+  // Re-attach slider handler since the section was replaced
+  const newSlider = document.getElementById('approvalSlider');
+  if (newSlider) {
+    newSlider.addEventListener('input', e => {
+      state.rates.approval = parseInt(e.target.value) / 100;
+      document.getElementById('approvalRateLabel').textContent = fmt.pct(state.rates.approval);
+      updateBudgetSection();
     });
   }
 }
