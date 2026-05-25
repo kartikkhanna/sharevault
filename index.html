@@ -807,8 +807,12 @@ function dedupeSourceData(raw) {
   const nchDupes = nchDedup.reduce((sum, r) => sum + (r._dupes || 0), 0);
   return {
     ...raw,
+    // Deduped arrays (for All-time, Date filter views — unique people)
     cardHolders: chDedup,
     nonCardHolders: nchDedup,
+    // Raw arrays (for Today view — actual visits today, including repeat customers)
+    cardHoldersRaw: raw.cardHolders || [],
+    nonCardHoldersRaw: raw.nonCardHolders || [],
     dataQuality: {
       ...(raw.dataQuality || {}),
       duplicatesRemoved: chDupes + nchDupes,
@@ -828,9 +832,16 @@ function applyFilters(raw, filters) {
     if (activeDate && r.date !== activeDate) return false;
     return true;
   };
+  // For a specific date (Today or Date filter), use RAW data — otherwise repeat
+  // visitors whose first visit was earlier in the activation get mapped back to
+  // their first visit date by dedupe, and would never appear in "today" counts.
+  // For All-time view, use deduped data — that's the right metric for unique people.
+  const useRaw = !!activeDate;
+  const chSource = useRaw ? (raw.cardHoldersRaw || raw.cardHolders) : raw.cardHolders;
+  const nchSource = useRaw ? (raw.nonCardHoldersRaw || raw.nonCardHolders) : raw.nonCardHolders;
   return {
-    cardHolders: raw.cardHolders.filter(matchRow),
-    nonCardHolders: raw.nonCardHolders.filter(matchRow),
+    cardHolders: chSource.filter(matchRow),
+    nonCardHolders: nchSource.filter(matchRow),
     activeDate
   };
 }
@@ -853,10 +864,15 @@ function locationSplit(raw, filters) {
   let activeDate = null;
   if (filters.mode === 'today') activeDate = todayISO();
   else if (filters.mode === 'date') activeDate = filters.date;
+  // Use raw arrays when filtering by a specific date so today's repeat visitors
+  // (who'd otherwise be merged back to first-visit date by dedupe) count properly.
+  const useRaw = !!activeDate;
+  const chSource = useRaw ? (raw.cardHoldersRaw || raw.cardHolders) : raw.cardHolders;
+  const nchSource = useRaw ? (raw.nonCardHoldersRaw || raw.nonCardHolders) : raw.nonCardHolders;
   return locs.map(loc => {
     const inLoc = r => r.location === loc && (!activeDate || r.date === activeDate);
-    const ch = raw.cardHolders.filter(inLoc);
-    const nch = raw.nonCardHolders.filter(inLoc);
+    const ch = chSource.filter(inLoc);
+    const nch = nchSource.filter(inLoc);
     return {
       code: loc,
       cardHolders: ch.length,
@@ -869,13 +885,17 @@ function locationSplit(raw, filters) {
 }
 
 function dailyTimeline(raw) {
+  // Use raw arrays so each day's bar reflects actual visits that day,
+  // not unique-people-first-seen-that-day (which would over-attribute to opening days).
+  const ch = raw.cardHoldersRaw || raw.cardHolders;
+  const nch = raw.nonCardHoldersRaw || raw.nonCardHolders;
   const dates = eachDate(raw.period.start, raw.period.end);
   let cumulative = 0;
   return dates.map(d => {
-    const ch = raw.cardHolders.filter(r => r.date === d).length;
-    const nch = raw.nonCardHolders.filter(r => r.date === d).length;
-    cumulative += (ch + nch);
-    return { date: d, cardHolders: ch, nonCardHolders: nch, total: ch + nch, cumulative };
+    const chCount = ch.filter(r => r.date === d).length;
+    const nchCount = nch.filter(r => r.date === d).length;
+    cumulative += (chCount + nchCount);
+    return { date: d, cardHolders: chCount, nonCardHolders: nchCount, total: chCount + nchCount, cumulative };
   });
 }
 
