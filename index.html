@@ -1368,7 +1368,7 @@ function renderForecastSection(forecast, levers, activeLevers, raw, approvalRate
   return `
     <div class="chart-card span-forecast fade-in d5">
       <div class="section-head">
-        <span><span class="label-soft">Budget</span> Forecast &amp; Levers</span>
+        <span><span class="label-soft">Budget</span> Forecast</span>
         <span class="small-meta">Target: AED ${fmt.num(ceiling)} · ${isOver ? `<span style="color:var(--danger);font-weight:700;">Over by AED ${fmt.num(Math.abs(overOrUnderRaw))}</span>` : `<span style="color:var(--success);font-weight:700;">Under by AED ${fmt.num(overOrUnderRaw)}</span>`}</span>
       </div>
 
@@ -1397,36 +1397,6 @@ function renderForecastSection(forecast, levers, activeLevers, raw, approvalRate
       <div class="forecast-section-title">Per-Location Burn</div>
       <div class="loc-grid">
         ${forecast.forecasts.map(buildLocationRow).join('')}
-      </div>
-
-      <!-- Levers -->
-      <div class="forecast-section-title">Budget Levers <span class="forecast-section-sub">— toggle to model savings, mostly affecting MCC (the only mall with future runway)</span></div>
-      <div class="lever-grid">
-        ${levers.filter(l => l.applicable).map(l => `
-          <label class="lever-row ${activeLevers[l.id] ? 'active' : ''}">
-            <input type="checkbox" data-lever="${l.id}" ${activeLevers[l.id] ? 'checked' : ''} />
-            <div class="lever-text">
-              <div class="lever-label">${l.label}</div>
-              <div class="lever-desc">${l.description}</div>
-            </div>
-            <div class="lever-savings">${l.savings > 0 ? `−AED ${fmt.num(l.savings)}` : '—'}</div>
-          </label>
-        `).join('')}
-      </div>
-
-      <!-- Ranked suggestions -->
-      <div class="forecast-section-title">Highest-Impact Options <span class="forecast-section-sub">— mechanical ranking by AED. Judge by brand impact + partner commitments.</span></div>
-      <div class="suggestions-list">
-        ${rankedLevers.slice(0, 5).map((l, i) => `
-          <div class="suggestion-row ${activeLevers[l.id] ? 'enabled' : ''}">
-            <div class="suggestion-rank">${i + 1}</div>
-            <div class="suggestion-text">
-              <div class="suggestion-label">${l.label}</div>
-              <div class="suggestion-desc">${l.description}</div>
-            </div>
-            <div class="suggestion-savings">AED ${fmt.num(l.savings)}</div>
-          </div>
-        `).join('')}
       </div>
 
       <div class="forecast-disclaimer">
