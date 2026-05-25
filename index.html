@@ -839,6 +839,26 @@ function applyFilters(raw, filters) {
   const useRaw = !!activeDate;
   const chSource = useRaw ? (raw.cardHoldersRaw || raw.cardHolders) : raw.cardHolders;
   const nchSource = useRaw ? (raw.nonCardHoldersRaw || raw.nonCardHolders) : raw.nonCardHolders;
+
+  // === DEBUG (remove later) ===
+  if (activeDate) {
+    const chAllToday = chSource.filter(r => r.date === activeDate);
+    const nchAllToday = nchSource.filter(r => r.date === activeDate);
+    console.log('=== FILTER DEBUG ===');
+    console.log('activeDate:', activeDate);
+    console.log('useRaw:', useRaw);
+    console.log('chSource.length (raw or dedup):', chSource.length);
+    console.log('nchSource.length:', nchSource.length);
+    console.log('CH with date === activeDate (any loc):', chAllToday.length);
+    console.log('NCH with date === activeDate (any loc):', nchAllToday.length);
+    console.log('First 5 CH dates seen:', [...new Set(chSource.map(r => r.date))].slice(0, 10));
+    console.log('Sample CH today row:', chAllToday[0]);
+    console.log('filters.location:', filters.location);
+    console.log('CH today matching location filter:', chAllToday.filter(r => filters.location === 'all' || r.location === filters.location).length);
+    console.log('=== END DEBUG ===');
+  }
+  // === END DEBUG ===
+
   return {
     cardHolders: chSource.filter(matchRow),
     nonCardHolders: nchSource.filter(matchRow),
