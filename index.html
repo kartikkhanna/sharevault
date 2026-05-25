@@ -704,7 +704,10 @@ const state = {
   rates: { signup: 0.15, lead: 0.30, approval: 0.10 },
   levers: {},  // toggled budget levers — { leverId: true/false }
   theme: 'light',
-  charts: {}
+  charts: {},
+  lastFetchOk: null,       // true after a successful refresh, false after a failed one
+  lastFetchAt: null,       // timestamp of last successful refresh
+  lastFetchFailedAt: null  // timestamp of latest failed refresh attempt
 };
 
 const fmt = {
@@ -2311,38 +2314,64 @@ async function fetchData() {
     }
     const separator = CONFIG.API_URL.includes('?') ? '&' : '?';
 
-    // Try v2 first (reads directly from agency xlsx, no sync drift, always fresh).
-    // If it errors or times out (>25s), fall back to v1 (live tracker sync data).
-    let data = null;
-    let source = 'v2';
+    // Always read from agency xlsx (v2). If v2 fails (timeout, transient error),
+    // we KEEP whatever data is already on screen rather than falling back to the
+    // corrupted live tracker. Stale data is better than wrong data.
+    const v2url = CONFIG.API_URL + separator + 'mode=dashboard_v2&_t=' + Date.now();
+    const v2controller = new AbortController();
+    const v2timeout = setTimeout(() => v2controller.abort(), 45000);  // 45s — xlsx conversion is slow
+
     try {
-      const v2url = CONFIG.API_URL + separator + 'mode=dashboard_v2&_t=' + Date.now();
-      const v2controller = new AbortController();
-      const v2timeout = setTimeout(() => v2controller.abort(), 25000);
       const v2res = await fetch(v2url, { cache: 'no-store', signal: v2controller.signal });
       clearTimeout(v2timeout);
       const v2data = await v2res.json();
-      if (v2data.error) throw new Error('v2 returned error: ' + v2data.error);
-      data = v2data;
+      if (v2data.error) throw new Error(v2data.error);
+
+      state.raw = dedupeSourceData(v2data);
+      state.lastFetchOk = true;
+      state.lastFetchAt = Date.now();
+      console.log('Dashboard refresh OK — CH:', v2data.cardHolders?.length, 'NCH:', v2data.nonCardHolders?.length);
+      render();
+
     } catch (v2err) {
-      console.warn('Dashboard v2 failed, falling back to v1:', v2err.message);
-      source = 'v1 (fallback)';
-      const v1url = CONFIG.API_URL + separator + '_t=' + Date.now();
-      const v1res = await fetch(v1url, { cache: 'no-store' });
-      data = await v1res.json();
-      if (data.error) throw new Error(data.error);
+      clearTimeout(v2timeout);
+      console.warn('Dashboard refresh failed (keeping existing data):', v2err.message);
+      state.lastFetchOk = false;
+      state.lastFetchFailedAt = Date.now();
+
+      if (!state.raw) {
+        // No data on screen yet — show error since we have nothing to display
+        document.getElementById('root').innerHTML = `
+          <div class="error-state">
+            <h3>Couldn't load dashboard data</h3>
+            <div>${v2err.message}</div>
+            <div style="margin-top: 10px; font-size: 12px;">Auto-retry in 5 minutes. You can also click the refresh button to try again now.</div>
+          </div>
+        `;
+      } else {
+        // Data already on screen — just update the timestamp area to indicate the refresh failed
+        updateStaleIndicator();
+      }
     }
-    console.log('Dashboard data source:', source, '— CH:', data.cardHolders?.length, 'NCH:', data.nonCardHolders?.length);
-    state.raw = dedupeSourceData(data);
-    render();
-  } catch (err) {
-    document.getElementById('root').innerHTML = `
-      <div class="error-state">
-        <h3>Couldn't load dashboard data</h3>
-        <div>${err.message}</div>
-        <pre>${err.stack || ''}</pre>
-      </div>
-    `;
+  } catch (outerErr) {
+    console.error('Unexpected error in fetchData:', outerErr);
+  }
+}
+
+// Update the header timestamp area to show a "refresh failed" hint when the latest
+// fetch errored. Called on failure and on the periodic 60s timestamp tick.
+function updateStaleIndicator() {
+  const el = document.querySelector('.meta-block .timestamp');
+  if (!el || !state.raw) return;
+  const stamp = state.raw.dataLastUpdated || state.raw.generatedAt;
+  if (state.lastFetchOk === false) {
+    const failedAt = state.lastFetchFailedAt || Date.now();
+    const failedAgo = fmt.relativeTime(new Date(failedAt).toISOString());
+    el.innerHTML = `<span style="color: var(--warn);">⚠ Refresh failed ${failedAgo}</span> · Data ${fmt.relativeTime(stamp)}`;
+    el.title = `Last successful fetch: ${fmt.timestamp(stamp)}. Latest refresh attempt failed — showing previous data.`;
+  } else {
+    el.textContent = `Data ${fmt.relativeTime(stamp)}`;
+    el.title = `Exact: ${fmt.timestamp(stamp)}`;
   }
 }
 
@@ -2356,15 +2385,11 @@ fetchData();
 setInterval(fetchData, CONFIG.REFRESH_INTERVAL_MS);
 
 // Tick the "Data X ago" display every 60s so it stays accurate
-// without triggering a full data refetch.
+// without triggering a full data refetch. Also re-renders the
+// failed-refresh indicator if the latest fetch errored.
 setInterval(() => {
   if (!state.raw) return;
-  const el = document.querySelector('.meta-block .timestamp');
-  if (el) {
-    const stamp = state.raw.dataLastUpdated || state.raw.generatedAt;
-    el.textContent = `Data ${fmt.relativeTime(stamp)}`;
-    el.title = `Exact: ${fmt.timestamp(stamp)}${state.raw.dataLastUpdated ? '' : ' (sheet timestamp not available — showing page fetch time)'}`;
-  }
+  updateStaleIndicator();
 }, 60000);
 </script>
 </body>
