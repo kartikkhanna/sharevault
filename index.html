@@ -466,6 +466,169 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
   font-weight: 500;
 }
 
+/* =========================================================
+   BUDGET FORECAST & LEVERS
+   ========================================================= */
+.span-forecast { grid-column: span 12; min-height: 500px; }
+
+.forecast-bar-wrap { margin: 8px 0 24px; }
+.forecast-bar-track {
+  position: relative;
+  height: 22px;
+  background: var(--card-tint);
+  border-radius: 11px;
+  overflow: visible;
+}
+.forecast-bar-fill {
+  position: absolute;
+  top: 0; bottom: 0;
+  height: 22px;
+  border-radius: 11px;
+  transition: width 400ms ease, left 400ms ease;
+}
+.forecast-bar-fill.confirmed { background: var(--pink); left: 0; z-index: 3; }
+.forecast-bar-fill.projected { background: var(--pink-soft); opacity: 0.5; z-index: 2; }
+.forecast-bar-fill.overflow { background: var(--danger); opacity: 0.7; z-index: 1; border-radius: 0 11px 11px 0; }
+.forecast-bar-ceiling {
+  position: absolute;
+  right: 0; top: -4px; bottom: -4px;
+  width: 2px;
+  background: var(--ink);
+  z-index: 4;
+}
+.forecast-bar-ceiling::after {
+  content: 'Target';
+  position: absolute;
+  top: -18px; right: -18px;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
+  color: var(--ink); text-transform: uppercase;
+}
+.forecast-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  font-size: 11px;
+  flex-wrap: wrap;
+}
+.forecast-bar-labels strong { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+.forecast-bar-labels .dot {
+  display: inline-block; width: 8px; height: 8px;
+  border-radius: 50%; margin-right: 6px; vertical-align: middle;
+}
+.forecast-bar-labels .confirmed-dot { background: var(--pink); }
+.forecast-bar-labels .projected-dot { background: var(--pink-soft); opacity: 0.5; }
+.forecast-bar-labels .ceiling-dot { background: var(--ink); }
+
+.forecast-section-title {
+  font-size: 11.5px; font-weight: 700;
+  color: var(--ink); margin: 20px 0 10px;
+  letter-spacing: -0.005em;
+}
+.forecast-section-title .forecast-section-sub {
+  font-size: 10.5px; font-weight: 500; color: var(--slate); letter-spacing: 0;
+}
+
+.loc-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 8px;
+}
+@media (max-width: 900px) { .loc-grid { grid-template-columns: 1fr; } }
+.loc-row {
+  background: var(--card-tint);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}
+.loc-row-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.loc-code { font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: 0.02em; }
+.loc-fullname { font-size: 10.5px; color: var(--slate); font-weight: 500; flex: 1; }
+.loc-badge {
+  font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.loc-badge.complete { background: var(--success-tint); color: var(--success); }
+.loc-badge.live { background: rgba(230,0,126,0.12); color: var(--pink); }
+.loc-badge.pending { background: rgba(199,126,0,0.12); color: var(--warn); }
+.loc-row-body { font-size: 11px; }
+.loc-meta { color: var(--muted); margin-bottom: 4px; font-size: 10px; font-weight: 500; }
+.loc-money { font-variant-numeric: tabular-nums; }
+.loc-spend { color: var(--ink-soft); font-weight: 600; }
+.loc-arrow { color: var(--muted); margin: 0 4px; }
+.loc-projected { color: var(--pink); font-weight: 700; }
+.loc-est { color: var(--warn); font-weight: 700; font-style: italic; }
+
+.lever-grid {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-bottom: 8px;
+}
+.lever-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--card-tint);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 160ms ease;
+}
+.lever-row:hover { border-color: var(--divider); background: var(--card); }
+.lever-row.active { background: rgba(230,0,126,0.06); border-color: rgba(230,0,126,0.3); }
+[data-theme="dark"] .lever-row.active { background: rgba(230,0,126,0.12); }
+.lever-row input[type="checkbox"] {
+  width: 16px; height: 16px;
+  accent-color: var(--pink);
+  cursor: pointer;
+}
+.lever-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.lever-label { font-size: 12px; font-weight: 600; color: var(--ink); }
+.lever-desc { font-size: 10.5px; color: var(--slate); font-weight: 500; line-height: 1.3; }
+.lever-savings {
+  font-size: 12px; font-weight: 700; color: var(--success);
+  font-variant-numeric: tabular-nums;
+  min-width: 90px; text-align: right;
+}
+
+.suggestions-list { display: flex; flex-direction: column; gap: 4px; }
+.suggestion-row {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--card-tint);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+}
+.suggestion-row.enabled { background: rgba(31,138,76,0.08); }
+[data-theme="dark"] .suggestion-row.enabled { background: rgba(31,138,76,0.16); }
+.suggestion-rank {
+  width: 22px; height: 22px;
+  background: var(--ink); color: white;
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+}
+.suggestion-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.suggestion-label { font-size: 11.5px; font-weight: 600; color: var(--ink); }
+.suggestion-desc { font-size: 10px; color: var(--slate); }
+.suggestion-savings { font-size: 12px; font-weight: 700; color: var(--success); font-variant-numeric: tabular-nums; }
+
+.forecast-disclaimer {
+  margin-top: 14px;
+  padding: 8px 12px;
+  background: var(--card-tint);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
 .loading { min-height: 70vh; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
 .loading-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--pink); animation: pulse 1400ms ease-in-out infinite; }
 .loading-label { font-size: 11px; font-weight: 600; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; }
@@ -539,6 +702,7 @@ const state = {
   raw: null,
   filters: { mode: 'all', date: null, location: 'all' },
   rates: { signup: 0.15, lead: 0.30, approval: 0.10 },
+  levers: {},  // toggled budget levers — { leverId: true/false }
   theme: 'light',
   charts: {}
 };
@@ -902,6 +1066,357 @@ function computeBudget(filtered, approvalRate) {
   return { confirmed, contingent, partner, unmatched, appliedCount };
 }
 
+// =============================================================
+// BUDGET FORECAST — Location-aware projection + levers
+// =============================================================
+const SHARE_BUDGET_CEILING = 700000;
+
+// Compute per-location SHARE spend so far (CH confirmed + NCH expected at current approval rate + gift cards)
+// Used to derive a daily run-rate per location
+function computeLocationSpend(raw, approvalRate, location) {
+  const ch = raw.cardHolders.filter(r => r.location === location);
+  const nch = raw.nonCardHolders.filter(r => r.location === location);
+
+  let confirmed = 0;
+  for (const row of ch) {
+    if (!row.prize) continue;
+    const m = lookupPrizeCost(row.prize);
+    if (m && m.funder === 'share') confirmed += m.cost;
+  }
+  // Mall gift cards: applied=Y × 50, confirmed
+  const appliedCount = nch.filter(r => r.applied === 'Y').length;
+  confirmed += appliedCount * 50;
+
+  // NCH SHARE prizes (contingent, weighted by approval rate)
+  let contingentFull = 0;
+  for (const row of nch) {
+    if (!row.prize) continue;
+    const m = lookupPrizeCost(row.prize);
+    if (m && m.funder === 'share') contingentFull += m.cost;
+  }
+  const contingentExpected = Math.round(contingentFull * approvalRate);
+
+  return {
+    location,
+    confirmed,
+    contingentFull,
+    contingentExpected,
+    expectedTotal: confirmed + contingentExpected,
+    appliedCount
+  };
+}
+
+// Compute the forecast for one location, given its window and current spend
+function projectLocationForecast(spend, todayISO, locConfig, raw, approvalRate, peerDailyRates) {
+  const periodStart = locConfig.start;
+  const periodEnd = locConfig.end;
+
+  // How many days has this location been running?
+  const today = new Date(todayISO + 'T00:00:00');
+  const start = new Date(periodStart + 'T00:00:00');
+  const end = new Date(periodEnd + 'T00:00:00');
+
+  const daysElapsed = today < start ? 0 : Math.min(
+    daysBetween(periodStart, todayISO) + 1,
+    daysBetween(periodStart, periodEnd) + 1
+  );
+  const daysRemaining = today > end ? 0 : Math.max(0, daysBetween(todayISO, periodEnd));
+  const daysTotal = daysBetween(periodStart, periodEnd) + 1;
+
+  let status, dailyRate, futureSpend;
+  if (today < start) {
+    // Location hasn't started yet (MCC before 1 Jun)
+    status = 'not_started';
+    // Estimate using average of peer daily rates (MoE + DCC)
+    dailyRate = peerDailyRates.length ? (peerDailyRates.reduce((a,b)=>a+b,0) / peerDailyRates.length) : 0;
+    futureSpend = Math.round(dailyRate * daysTotal);
+  } else if (today > end) {
+    status = 'complete';
+    dailyRate = daysElapsed > 0 ? spend.expectedTotal / daysElapsed : 0;
+    futureSpend = 0;
+  } else {
+    status = 'in_progress';
+    dailyRate = daysElapsed > 0 ? spend.expectedTotal / daysElapsed : 0;
+    futureSpend = Math.round(dailyRate * daysRemaining);
+  }
+
+  return {
+    location: spend.location,
+    fullName: locConfig.fullName,
+    status,
+    daysElapsed,
+    daysRemaining,
+    daysTotal,
+    currentSpend: spend.expectedTotal,
+    dailyRate,
+    futureSpend,
+    projectedEnd: spend.expectedTotal + futureSpend,
+    contingentFull: spend.contingentFull,
+    confirmed: spend.confirmed
+  };
+}
+
+function computeForecast(raw, approvalRate) {
+  const today = todayISO();
+  const locs = ['MoE', 'DCC', 'MCC'];
+  const locConfigs = raw.period.locations;
+
+  // Compute current spend per location
+  const spends = locs.map(l => computeLocationSpend(raw, approvalRate, l));
+
+  // Identify peer daily rates for MCC estimate (locations that have started)
+  const startedSpends = [];
+  for (let i = 0; i < locs.length; i++) {
+    const cfg = locConfigs[locs[i]];
+    const start = new Date(cfg.start + 'T00:00:00');
+    const nowD = new Date(today + 'T00:00:00');
+    if (nowD >= start) {
+      const elapsed = daysBetween(cfg.start, today) + 1;
+      const rate = elapsed > 0 ? spends[i].expectedTotal / elapsed : 0;
+      if (rate > 0) startedSpends.push(rate);
+    }
+  }
+
+  const forecasts = spends.map((s, i) =>
+    projectLocationForecast(s, today, locConfigs[locs[i]], raw, approvalRate, startedSpends)
+  );
+
+  const totalCurrent = forecasts.reduce((a, f) => a + f.currentSpend, 0);
+  const totalFuture = forecasts.reduce((a, f) => a + f.futureSpend, 0);
+  const totalProjected = totalCurrent + totalFuture;
+
+  return {
+    forecasts,
+    totalCurrent,
+    totalFuture,
+    totalProjected,
+    ceiling: SHARE_BUDGET_CEILING,
+    overBy: Math.max(0, totalProjected - SHARE_BUDGET_CEILING),
+    underBy: Math.max(0, SHARE_BUDGET_CEILING - totalProjected)
+  };
+}
+
+// =============================================================
+// BUDGET LEVERS — model what-if scenarios
+// =============================================================
+// Each lever computes a "savings" amount in AED. User toggles ON to subtract from forecast.
+function computeLevers(raw, approvalRate, forecast) {
+  const today = todayISO();
+  const locConfigs = raw.period.locations;
+  const mccConfig = locConfigs.MCC;
+  const mccStarted = new Date(today + 'T00:00:00') >= new Date(mccConfig.start + 'T00:00:00');
+
+  const levers = [];
+
+  // Helper: compute spend if we apply a transformation to MCC's projected NCH prize distribution
+  // We use peer (MoE + DCC) prize distribution scaled to MCC's projected footfall
+  const mccForecast = forecast.forecasts.find(f => f.location === 'MCC');
+  const mccProjected = mccForecast ? mccForecast.projectedEnd : 0;
+  const mccCurrent = mccForecast ? mccForecast.currentSpend : 0;
+  const mccFuture = mccForecast ? mccForecast.futureSpend : 0;
+
+  // Compute CH spend share (from MoE + DCC current data) — apply to MCC future spend
+  const peerLocs = ['MoE', 'DCC'];
+  let peerCHSpend = 0, peerNCHSpend = 0;
+  for (const loc of peerLocs) {
+    const ch = raw.cardHolders.filter(r => r.location === loc);
+    const nch = raw.nonCardHolders.filter(r => r.location === loc);
+    for (const r of ch) {
+      const m = lookupPrizeCost(r.prize);
+      if (m && m.funder === 'share') peerCHSpend += m.cost;
+    }
+    for (const r of nch) {
+      const m = lookupPrizeCost(r.prize);
+      if (m && m.funder === 'share') peerNCHSpend += m.cost;
+    }
+  }
+  const peerCHRatio = (peerCHSpend + peerNCHSpend) > 0 ? peerCHSpend / (peerCHSpend + peerNCHSpend) : 0;
+
+  // Lever 1: Cut all CH prizes at MCC (only applies to MCC future, since MoE/DCC are mostly done)
+  levers.push({
+    id: 'mcc_no_ch',
+    label: 'Cut all Card Holder prizes at MCC',
+    description: 'No SHARE Points or Noor Box for CH at City Centre Mirdif',
+    savings: Math.round(mccFuture * peerCHRatio),
+    applicable: mccProjected > 0
+  });
+
+  // Lever 2: Cut Noor Box from MCC entirely (CH + NCH)
+  // Estimate Noor Box volume at MCC from peer rate
+  let peerNoorCount = 0;
+  for (const loc of peerLocs) {
+    const all = [...raw.cardHolders.filter(r => r.location === loc), ...raw.nonCardHolders.filter(r => r.location === loc)];
+    peerNoorCount += all.filter(r => /noor box/i.test(r.prize || '')).length;
+  }
+  const peerDaysElapsed = Math.max(1, daysBetween(locConfigs.MoE.start, today));
+  const noorPerDay = peerNoorCount / (peerDaysElapsed * peerLocs.length);
+  const mccDays = mccForecast ? mccForecast.daysTotal : 15;
+  const mccNoorEstimate = Math.round(noorPerDay * mccDays * approvalRate);  // NCH portion contingent
+  levers.push({
+    id: 'mcc_no_noor',
+    label: 'Cut Noor Box from MCC',
+    description: 'Remove the 4 Noor Boxes planned for MCC',
+    savings: 4 * 1300,  // 4 boxes × AED 1,300 — from xlsx plan
+    applicable: mccProjected > 0
+  });
+
+  // Lever 3: Cut highest tier SP (AED 2,500) from MCC NCH
+  // From xlsx plan: 5 × AED 2,500 at MCC NCH = 12,500
+  levers.push({
+    id: 'mcc_no_2500',
+    label: 'Remove AED 2,500 SHARE Points tier at MCC',
+    description: 'Drop the highest tier NCH prize at MCC (5 planned)',
+    savings: Math.round(5 * 2500 * approvalRate),
+    applicable: mccProjected > 0
+  });
+
+  // Lever 4: Cut AED 1,000 SP from MCC NCH (15 planned)
+  levers.push({
+    id: 'mcc_no_1000',
+    label: 'Remove AED 1,000 SHARE Points tier at MCC',
+    description: 'Drop the second-highest tier NCH prize at MCC (15 planned)',
+    savings: Math.round(15 * 1000 * approvalRate),
+    applicable: mccProjected > 0
+  });
+
+  // Lever 5: Reduce AED 500 SP volume by 50% at MCC NCH (350 planned)
+  levers.push({
+    id: 'mcc_500_half',
+    label: 'Reduce AED 500 SHARE Points volume by 50% at MCC',
+    description: 'Cut 350 → 175 of AED 500 prizes at MCC NCH',
+    savings: Math.round(175 * 500 * approvalRate),
+    applicable: mccProjected > 0
+  });
+
+  // Lever 6: Reduce AED 250 SP volume by 30% at MCC NCH (1800 planned, the bulk volume)
+  levers.push({
+    id: 'mcc_250_minus_30',
+    label: 'Reduce AED 250 SHARE Points volume by 30% at MCC',
+    description: 'Cut the bulk volume tier (1800 → 1260) at MCC NCH',
+    savings: Math.round(540 * 250 * approvalRate),
+    applicable: mccProjected > 0
+  });
+
+  return levers;
+}
+
+function renderForecastSection(forecast, levers, activeLevers, raw, approvalRate) {
+  const totalSavings = levers.filter(l => activeLevers[l.id]).reduce((a, l) => a + l.savings, 0);
+  const projectedAfterLevers = forecast.totalProjected - totalSavings;
+  const ceiling = forecast.ceiling;
+  const overOrUnderRaw = ceiling - projectedAfterLevers;
+  const isOver = overOrUnderRaw < 0;
+
+  // Progress bar math
+  const ceilingBarPct = 100;
+  const currentBarPct = Math.min(100, (forecast.totalCurrent / ceiling) * 100);
+  const projectedBarPct = Math.min(100, (projectedAfterLevers / ceiling) * 100);
+  const overflowPct = projectedAfterLevers > ceiling ? Math.min(100, ((projectedAfterLevers - ceiling) / ceiling) * 100) : 0;
+
+  // Per-location rendering
+  const buildLocationRow = (f) => {
+    const statusBadge = f.status === 'complete' ? '<span class="loc-badge complete">Complete</span>' :
+                       f.status === 'not_started' ? '<span class="loc-badge pending">Not started</span>' :
+                       '<span class="loc-badge live">Live</span>';
+    const isPending = f.status === 'not_started';
+    const projection = isPending
+      ? `<span class="loc-est">est. AED ${fmt.num(f.projectedEnd)}</span>`
+      : `<span class="loc-spend">AED ${fmt.num(f.currentSpend)}</span> <span class="loc-arrow">→</span> <span class="loc-projected">AED ${fmt.num(f.projectedEnd)}</span>`;
+    const dayInfo = f.status === 'complete' ? `${f.daysTotal} days · done` :
+                    f.status === 'not_started' ? `${f.daysTotal} days planned · estimated from MoE/DCC` :
+                    `${f.daysElapsed} of ${f.daysTotal} days · ${f.daysRemaining} left`;
+    return `
+      <div class="loc-row">
+        <div class="loc-row-head">
+          <span class="loc-code">${f.location}</span>
+          <span class="loc-fullname">${f.fullName}</span>
+          ${statusBadge}
+        </div>
+        <div class="loc-row-body">
+          <div class="loc-meta">${dayInfo}</div>
+          <div class="loc-money">${projection}</div>
+        </div>
+      </div>
+    `;
+  };
+
+  // Sort levers by savings (highest first) for the ranked suggestions
+  const rankedLevers = [...levers]
+    .filter(l => l.applicable && l.savings > 0)
+    .sort((a, b) => b.savings - a.savings);
+
+  return `
+    <div class="chart-card span-forecast fade-in d5">
+      <div class="section-head">
+        <span><span class="label-soft">Budget</span> Forecast &amp; Levers</span>
+        <span class="small-meta">Target: AED ${fmt.num(ceiling)} · ${isOver ? `<span style="color:var(--danger);font-weight:700;">Over by AED ${fmt.num(Math.abs(overOrUnderRaw))}</span>` : `<span style="color:var(--success);font-weight:700;">Under by AED ${fmt.num(overOrUnderRaw)}</span>`}</span>
+      </div>
+
+      <!-- Headline Bar -->
+      <div class="forecast-bar-wrap">
+        <div class="forecast-bar-track">
+          <div class="forecast-bar-fill confirmed" style="width:${currentBarPct}%" title="Spent so far: AED ${fmt.num(forecast.totalCurrent)}"></div>
+          <div class="forecast-bar-fill projected" style="left:${currentBarPct}%; width:${Math.max(0, projectedBarPct - currentBarPct)}%" title="Forecast to add: AED ${fmt.num(projectedAfterLevers - forecast.totalCurrent)}"></div>
+          ${overflowPct > 0 ? `<div class="forecast-bar-fill overflow" style="left:100%; width:${overflowPct}%"></div>` : ''}
+          <div class="forecast-bar-ceiling"></div>
+        </div>
+        <div class="forecast-bar-labels">
+          <div class="bar-label-left">
+            <span class="dot confirmed-dot"></span>Confirmed <strong>AED ${fmt.num(forecast.totalCurrent)}</strong>
+          </div>
+          <div class="bar-label-mid">
+            <span class="dot projected-dot"></span>Projected end <strong>AED ${fmt.num(projectedAfterLevers)}</strong>${totalSavings > 0 ? ` <span style="color:var(--success);font-weight:600;">(−${fmt.num(totalSavings)} from levers)</span>` : ''}
+          </div>
+          <div class="bar-label-right">
+            <span class="dot ceiling-dot"></span>Target <strong>AED ${fmt.num(ceiling)}</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Per-location -->
+      <div class="forecast-section-title">Per-Location Burn</div>
+      <div class="loc-grid">
+        ${forecast.forecasts.map(buildLocationRow).join('')}
+      </div>
+
+      <!-- Levers -->
+      <div class="forecast-section-title">Budget Levers <span class="forecast-section-sub">— toggle to model savings, mostly affecting MCC (the only mall with future runway)</span></div>
+      <div class="lever-grid">
+        ${levers.filter(l => l.applicable).map(l => `
+          <label class="lever-row ${activeLevers[l.id] ? 'active' : ''}">
+            <input type="checkbox" data-lever="${l.id}" ${activeLevers[l.id] ? 'checked' : ''} />
+            <div class="lever-text">
+              <div class="lever-label">${l.label}</div>
+              <div class="lever-desc">${l.description}</div>
+            </div>
+            <div class="lever-savings">${l.savings > 0 ? `−AED ${fmt.num(l.savings)}` : '—'}</div>
+          </label>
+        `).join('')}
+      </div>
+
+      <!-- Ranked suggestions -->
+      <div class="forecast-section-title">Highest-Impact Options <span class="forecast-section-sub">— mechanical ranking by AED. Judge by brand impact + partner commitments.</span></div>
+      <div class="suggestions-list">
+        ${rankedLevers.slice(0, 5).map((l, i) => `
+          <div class="suggestion-row ${activeLevers[l.id] ? 'enabled' : ''}">
+            <div class="suggestion-rank">${i + 1}</div>
+            <div class="suggestion-text">
+              <div class="suggestion-label">${l.label}</div>
+              <div class="suggestion-desc">${l.description}</div>
+            </div>
+            <div class="suggestion-savings">AED ${fmt.num(l.savings)}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="forecast-disclaimer">
+        ⚠ Forecast uses location-aware projection: MoE/DCC at current daily rate, MCC estimated from MoE + DCC averages. Contingent NCH spend included at ${fmt.pct(approvalRate)} approval rate.
+      </div>
+    </div>
+  `;
+}
+
+
 function renderBudgetSection(budget, approvalRate) {
   const confirmedTotal = budget.confirmed.total;
   const contingentExpected = budget.contingent.total;
@@ -1031,6 +1546,8 @@ function render() {
   const estCardsIssued = Math.round(totalApplied * state.rates.lead);
 
   const budget = computeBudget(filtered, state.rates.approval);
+  const forecast = computeForecast(raw, state.rates.approval);
+  const levers = computeLevers(raw, state.rates.approval, forecast);
 
   const dq = raw.dataQuality || {};
 
@@ -1256,6 +1773,8 @@ function render() {
       ${renderRejectionSection(filtered.nonCardHolders)}
 
       ${renderBudgetSection(budget, state.rates.approval)}
+
+      ${renderForecastSection(forecast, levers, state.levers, raw, state.rates.approval)}
 
     </div>
   </div>
@@ -1699,8 +2218,18 @@ function attachHandlers() {
       state.rates.approval = parseInt(e.target.value) / 100;
       document.getElementById('approvalRateLabel').textContent = fmt.pct(state.rates.approval);
       updateBudgetSection();
+      updateForecastSection();
     });
   }
+
+  // Lever checkboxes — toggle savings impact
+  document.querySelectorAll('input[data-lever]').forEach(cb => {
+    cb.addEventListener('change', e => {
+      const leverId = e.target.dataset.lever;
+      state.levers[leverId] = e.target.checked;
+      updateForecastSection();
+    });
+  });
 }
 
 // Patch in only the budget section (used when approval slider moves)
@@ -1720,8 +2249,29 @@ function updateBudgetSection() {
       state.rates.approval = parseInt(e.target.value) / 100;
       document.getElementById('approvalRateLabel').textContent = fmt.pct(state.rates.approval);
       updateBudgetSection();
+      updateForecastSection();
     });
   }
+}
+
+// Patch in only the forecast section (used when levers toggle or approval changes)
+function updateForecastSection() {
+  if (!state.raw) return;
+  const forecast = computeForecast(state.raw, state.rates.approval);
+  const levers = computeLevers(state.raw, state.rates.approval, forecast);
+  const existing = document.querySelector('.span-forecast');
+  if (!existing) return;
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = renderForecastSection(forecast, levers, state.levers, state.raw, state.rates.approval);
+  existing.replaceWith(wrapper.firstElementChild);
+  // Re-attach checkbox handlers (DOM was replaced)
+  document.querySelectorAll('input[data-lever]').forEach(cb => {
+    cb.addEventListener('change', e => {
+      const leverId = e.target.dataset.lever;
+      state.levers[leverId] = e.target.checked;
+      updateForecastSection();
+    });
+  });
 }
 
 function updateProjections() {
