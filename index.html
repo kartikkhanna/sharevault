@@ -21,6 +21,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -844,6 +845,118 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
 .toast-success { background: #1f8a4c; }
 .toast-error { background: #c8102e; }
 [data-theme="dark"] .toast { box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
+
+/* =========================================================
+   LEADERSHIP REPORT — Styles for the downloadable PNG
+   Mirrors the screenshot reference: gray headers, alternating
+   rows, total column on right, today column highlighted pink.
+   ========================================================= */
+.report-wrap {
+  font-family: 'Poppins', sans-serif;
+  background: #ffffff;
+  color: #1a1a1a;
+  padding: 24px;
+  min-width: 1400px;  /* fixed-ish width for consistent table layout */
+}
+.report-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-bottom: 18px;
+  border-bottom: 3px solid #E6007E;
+  margin-bottom: 22px;
+}
+.report-title {
+  font-size: 22px; font-weight: 700; color: #1a1a1a; letter-spacing: -0.01em;
+}
+.report-subtitle {
+  font-size: 12px; color: #6b6b6b; margin-top: 4px; font-weight: 500;
+}
+.report-partners {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.2em;
+  color: #6b6b6b; text-transform: uppercase;
+  padding: 4px 10px; background: #f6f7f9; border-radius: 4px;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  margin-bottom: 18px;
+  font-variant-numeric: tabular-nums;
+  table-layout: auto;
+}
+.report-table th, .report-table td {
+  border: 1px solid #d8d8d8;
+  padding: 6px 8px;
+  text-align: center;
+  white-space: nowrap;
+}
+.report-table th {
+  background: #e8e8e8;
+  font-weight: 700;
+  font-size: 10.5px;
+  color: #1a1a1a;
+}
+.report-table th.today-col {
+  background: #fde7f2;
+  color: #b80064;
+}
+.report-table th.total-col {
+  background: #d8d8d8;
+}
+.report-table .row-label {
+  text-align: left;
+  font-weight: 700;
+  background: #fafafa;
+  padding-left: 12px;
+  min-width: 130px;
+}
+.report-table .row-label.pct-label {
+  font-weight: 600;
+  color: #6b6b6b;
+  font-style: italic;
+}
+.report-table .report-block-title {
+  text-align: left;
+  background: #1a1a1a;
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding-left: 12px;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+.report-table .total-col {
+  background: #f6f7f9;
+  font-weight: 700;
+}
+.report-table .pct {
+  color: #3a3a3a;
+  font-weight: 500;
+}
+.report-table .today-col {
+  background: #fff5fa;
+}
+.report-table tr:nth-child(even) td:not(.row-label):not(.total-col):not(.today-col) {
+  background: #fcfcfc;
+}
+.report-table td.pre-block {
+  background: #f6f7f9;
+  color: #bbbbbb;
+  font-style: italic;
+}
+.report-table th.pre-block {
+  color: #999999;
+}
+
+.report-footer {
+  margin-top: 16px;
+  font-size: 10px;
+  color: #9a9a9a;
+  text-align: right;
+  font-style: italic;
+}
 
 @media print {
   .icon-btn { display: none !important; }
@@ -1760,9 +1873,9 @@ function renderForecastSection(baselineForecast, tighterForecast, raw, approvalR
         ${buildForecastCard(baselineForecast, {
           variant: 'baseline',
           title: 'Current Mechanic',
-          subtitle: 'CH gets SHARE Points + Noor Box · NCH gets all tiers · Gift card to every Applied=Y · includes warm-lead conversion bonus',
+          subtitle: 'CH gets SHARE Points + Noor Box · NCH gets all tiers · Gift card to every Applied=Y · warm leads bring back their SHARE Points prize on later conversion',
           extraNote: baselineForecast.warmCount > 0
-            ? `+AED ${fmt.num(baselineForecast.warmBonus)} from <strong>${baselineForecast.warmCount}</strong> warm leads × <strong>${fmt.pct(warmConvRate)}</strong> conversion`
+            ? `+AED ${fmt.num(baselineForecast.warmBonus)} from <strong>${baselineForecast.warmCount}</strong> warm leads × <strong>${fmt.pct(warmConvRate)}</strong> later conversion — SHARE Points landing (no gift card)`
             : ''
         })}
         ${buildForecastCard(tighterForecast, {
@@ -1961,6 +2074,7 @@ function render() {
   const MOON_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
   const REFRESH_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.41-6.36L23 10"/><path d="M23 4v6h-6"/><path d="M21 12a9 9 0 0 1-15.41 6.36L1 14"/><path d="M1 20v-6h6"/></svg>`;
   const SYNC_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v6h6"/><path d="M20 20v-6h-6"/><path d="M4 10a8 8 0 0 1 14.93-2"/><path d="M20 14a8 8 0 0 1-14.93 2"/></svg>`;
+  const REPORT_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>`;
 
   const html = `
   <header class="header-band">
@@ -1977,6 +2091,7 @@ function render() {
           Data ${fmt.relativeTime(raw.dataLastUpdated || raw.generatedAt)}
         </div>
         <button class="icon-btn" id="syncBtn" title="Pull latest from agency xlsx now">${SYNC_ICON}</button>
+        <button class="icon-btn" id="reportBtn" title="Download daily report for leadership">${REPORT_ICON}</button>
         <button class="icon-btn" id="refreshBtn" title="Refresh">${REFRESH_ICON}</button>
         <button class="icon-btn" id="themeBtn" title="Toggle theme">${state.theme === 'light' ? MOON_ICON : SUN_ICON}</button>
       </div>
@@ -2526,6 +2641,263 @@ function renderCharts(raw, filtered, locs) {
   });
 }
 
+// =============================================================
+// LEADERSHIP REPORT — Generate downloadable PNG table for daily sharing
+// =============================================================
+// Hardcoded daily totals for the period that pre-dates the data-quality fix.
+// From 27-May onwards we compute from the live dashboard data.
+// (Hardcoded values manually verified against the version shared with leadership.)
+const REPORT_HARDCODED = {
+  total: {
+    '2026-05-15': {total: 293, ch: 180, nch: 113, signup: 24},
+    '2026-05-16': {total: 281, ch: 157, nch: 124, signup: 47},
+    '2026-05-17': {total: 308, ch: 137, nch: 171, signup: 67},
+    '2026-05-18': {total: 239, ch: 91,  nch: 148, signup: 36},
+    '2026-05-19': {total: 196, ch: 65,  nch: 131, signup: 32},
+    '2026-05-20': {total: 162, ch: 67,  nch: 95,  signup: 27},
+    '2026-05-21': {total: 261, ch: 81,  nch: 180, signup: 91},
+    '2026-05-22': {total: 337, ch: 98,  nch: 239, signup: 129},
+    '2026-05-23': {total: 969, ch: 360, nch: 609, signup: 376},
+    '2026-05-24': {total: 892, ch: 337, nch: 555, signup: 383},
+    '2026-05-25': {total: 486, ch: 180, nch: 306, signup: 181},
+    '2026-05-26': {total: 722, ch: 281, nch: 441, signup: 290}
+  },
+  MoE: {
+    '2026-05-15': {total: 293, ch: 180, nch: 113, signup: 24},
+    '2026-05-16': {total: 281, ch: 157, nch: 124, signup: 47},
+    '2026-05-17': {total: 308, ch: 137, nch: 171, signup: 67},
+    '2026-05-18': {total: 239, ch: 91,  nch: 148, signup: 36},
+    '2026-05-19': {total: 196, ch: 65,  nch: 131, signup: 32},
+    '2026-05-20': {total: 162, ch: 67,  nch: 95,  signup: 27},
+    '2026-05-21': {total: 261, ch: 81,  nch: 180, signup: 91},
+    '2026-05-22': {total: 337, ch: 98,  nch: 239, signup: 129},
+    '2026-05-23': {total: 441, ch: 162, nch: 279, signup: 171},
+    '2026-05-24': {total: 389, ch: 153, nch: 236, signup: 149},
+    '2026-05-25': {total: 218, ch: 80,  nch: 138, signup: 78},
+    '2026-05-26': {total: 309, ch: 119, nch: 190, signup: 119}
+  },
+  DCC: {
+    '2026-05-23': {total: 528, ch: 198, nch: 330, signup: 205},
+    '2026-05-24': {total: 503, ch: 184, nch: 319, signup: 234},
+    '2026-05-25': {total: 268, ch: 100, nch: 168, signup: 103},
+    '2026-05-26': {total: 413, ch: 162, nch: 251, signup: 171}
+  },
+  MCC: {}
+};
+// Live data starts on this date. Dates before this use REPORT_HARDCODED.
+const REPORT_LIVE_FROM = '2026-05-27';
+
+// Compute live daily numbers for a single date / location bucket
+// Uses raw (non-deduped) arrays so each visit counts, matching what's shared with leadership
+function computeReportDay(raw, date, location) {
+  const ch = (raw.cardHoldersRaw || raw.cardHolders).filter(r =>
+    r.date === date && (location === 'total' || r.location === location)
+  );
+  const nch = (raw.nonCardHoldersRaw || raw.nonCardHolders).filter(r =>
+    r.date === date && (location === 'total' || r.location === location)
+  );
+  const signups = nch.filter(r => r.applied === 'Y').length;
+  return {
+    total: ch.length + nch.length,
+    ch: ch.length,
+    nch: nch.length,
+    signup: signups
+  };
+}
+
+// Get the data for a date+location, using hardcoded if pre-cutover, live otherwise
+function getReportData(raw, date, location) {
+  if (date < REPORT_LIVE_FROM) {
+    return REPORT_HARDCODED[location][date] || {total: 0, ch: 0, nch: 0, signup: 0};
+  }
+  return computeReportDay(raw, date, location);
+}
+
+// Build the list of dates we need to show: May 15 to today
+function getReportDates(raw) {
+  const start = '2026-05-15';
+  const today = todayISO();
+  return eachDate(start, today);
+}
+
+// Build a single block (Total / MoE / DCC / MCC) as an HTML table fragment
+function buildReportBlock(raw, blockTitle, locationKey, dates, blockStartDate) {
+  const todayStr = todayISO();
+  let rowTotal = 0, rowCh = 0, rowNch = 0, rowSignup = 0;
+
+  // Header
+  let headHtml = `<tr><th class="report-block-title">${blockTitle}</th>`;
+  for (const d of dates) {
+    const isToday = d === todayStr;
+    const isPreBlock = blockStartDate && d < blockStartDate;
+    const display = new Date(d + 'T00:00:00').toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: '2-digit'}).replace(/ /g, '-');
+    headHtml += `<th class="${isToday ? 'today-col' : ''} ${isPreBlock ? 'pre-block' : ''}">${display}</th>`;
+  }
+  headHtml += `<th class="total-col">Total</th></tr>`;
+
+  // Data rows
+  const rows = {total: [], ch: [], nch: [], signup: []};
+  for (const d of dates) {
+    const data = getReportData(raw, d, locationKey);
+    const isPreBlock = blockStartDate && d < blockStartDate;
+    rows.total.push({val: isPreBlock ? null : data.total, isToday: d === todayStr, isPreBlock});
+    rows.ch.push({val: isPreBlock ? null : data.ch, isToday: d === todayStr, isPreBlock});
+    rows.nch.push({val: isPreBlock ? null : data.nch, isToday: d === todayStr, isPreBlock});
+    rows.signup.push({val: isPreBlock ? null : data.signup, isToday: d === todayStr, isPreBlock});
+    if (!isPreBlock) {
+      rowTotal += data.total;
+      rowCh += data.ch;
+      rowNch += data.nch;
+      rowSignup += data.signup;
+    }
+  }
+
+  const buildCell = c => {
+    if (c.isPreBlock) return `<td class="pre-block">–</td>`;
+    return `<td class="${c.isToday ? 'today-col' : ''}">${fmt.num(c.val)}</td>`;
+  };
+  const buildPctCell = (n, denom, cellMeta) => {
+    if (cellMeta.isPreBlock) return `<td class="pct pre-block">–</td>`;
+    const pct = denom > 0 ? Math.round((n / denom) * 100) : 0;
+    return `<td class="pct ${cellMeta.isToday ? 'today-col' : ''}">${pct}%</td>`;
+  };
+
+  let bodyHtml = '';
+  // Total row
+  bodyHtml += `<tr><td class="row-label">Total</td>${rows.total.map(buildCell).join('')}<td class="total-col">${fmt.num(rowTotal)}</td></tr>`;
+  // Card Holder
+  bodyHtml += `<tr><td class="row-label">Card Holder</td>${rows.ch.map(buildCell).join('')}<td class="total-col">${fmt.num(rowCh)}</td></tr>`;
+  // Card Holder %
+  bodyHtml += `<tr><td class="row-label pct-label">%</td>${rows.ch.map((c, i) => buildPctCell(c.val, rows.total[i].val, c)).join('')}<td class="total-col pct">${rowTotal > 0 ? Math.round((rowCh / rowTotal) * 100) : 0}%</td></tr>`;
+  // Non-Card Holder
+  bodyHtml += `<tr><td class="row-label">Non Card Holder</td>${rows.nch.map(buildCell).join('')}<td class="total-col">${fmt.num(rowNch)}</td></tr>`;
+  // Non-Card Holder %
+  bodyHtml += `<tr><td class="row-label pct-label">%</td>${rows.nch.map((c, i) => buildPctCell(c.val, rows.total[i].val, c)).join('')}<td class="total-col pct">${rowTotal > 0 ? Math.round((rowNch / rowTotal) * 100) : 0}%</td></tr>`;
+  // Sign Up
+  bodyHtml += `<tr><td class="row-label">Sign Up</td>${rows.signup.map(buildCell).join('')}<td class="total-col">${fmt.num(rowSignup)}</td></tr>`;
+  // Sign Up % (denominator is NCH, not total)
+  bodyHtml += `<tr><td class="row-label pct-label">%</td>${rows.signup.map((c, i) => buildPctCell(c.val, rows.nch[i].val, c)).join('')}<td class="total-col pct">${rowNch > 0 ? Math.round((rowSignup / rowNch) * 100) : 0}%</td></tr>`;
+
+  return `<table class="report-table">${headHtml}${bodyHtml}</table>`;
+}
+
+// Build the entire report HTML — Total + MoE + DCC + MCC blocks
+function buildReportHtml(raw) {
+  const dates = getReportDates(raw);
+  const todayStr = todayISO();
+  const reportTitle = `SHARE Vault · Daily Performance Report`;
+  const reportDate = new Date(todayStr + 'T00:00:00').toLocaleDateString('en-GB', {
+    weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
+  });
+
+  return `
+    <div class="report-wrap">
+      <div class="report-header">
+        <div class="report-header-left">
+          <div class="report-title">${reportTitle}</div>
+          <div class="report-subtitle">Emirates NBD × Visa × Majid Al Futtaim · ${reportDate}</div>
+        </div>
+        <div class="report-header-right">
+          <div class="report-partners">ENBD · VISA · MAF</div>
+        </div>
+      </div>
+
+      ${buildReportBlock(raw, 'Overall', 'total', dates, null)}
+      ${buildReportBlock(raw, 'MOE', 'MoE', dates, '2026-05-15')}
+      ${buildReportBlock(raw, 'DCC', 'DCC', dates, '2026-05-23')}
+      ${buildReportBlock(raw, 'MCC', 'MCC', dates, '2026-06-01')}
+
+      <div class="report-footer">
+        Activation period: 15-May → 15-Jun · Generated ${new Date().toLocaleString('en-GB', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'})}
+      </div>
+    </div>
+  `;
+}
+
+// Generate the PNG and trigger download + share
+async function generateAndShareReport() {
+  if (!state.raw) {
+    showToast('Dashboard data not loaded yet', 'error', 3000);
+    return;
+  }
+
+  const btn = document.getElementById('reportBtn');
+  if (btn) {
+    btn.classList.add('spinning');
+    btn.disabled = true;
+  }
+  showToast('Generating report…', 'info', 0);
+
+  try {
+    // Create a hidden container, render the report into it, snapshot, then remove
+    const container = document.createElement('div');
+    container.id = 'report-render-target';
+    container.style.cssText = 'position: fixed; left: -10000px; top: 0; width: auto; background: white; padding: 32px; font-family: Poppins, sans-serif;';
+    container.innerHTML = buildReportHtml(state.raw);
+    document.body.appendChild(container);
+
+    // Wait a tick for fonts/layout
+    await new Promise(r => setTimeout(r, 100));
+
+    const target = container.querySelector('.report-wrap');
+    const canvas = await html2canvas(target, {
+      scale: 2,         // 2x for retina/sharp output
+      backgroundColor: '#ffffff',
+      logging: false,
+      useCORS: true
+    });
+
+    document.body.removeChild(container);
+
+    // Convert to blob
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    const filename = `SHARE_Vault_Report_${todayISO()}.png`;
+
+    // Try native Share API first (mobile + modern desktop browsers)
+    if (navigator.share && navigator.canShare) {
+      const file = new File([blob], filename, {type: 'image/png'});
+      if (navigator.canShare({files: [file]})) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: 'SHARE Vault Daily Report',
+            text: `SHARE Vault performance — ${new Date().toLocaleDateString('en-GB', {day: '2-digit', month: 'long', year: 'numeric'})}`
+          });
+          showToast('Report shared', 'success', 2500);
+          return;
+        } catch (shareErr) {
+          // User cancelled the share sheet or share failed — fall through to download
+          if (shareErr.name === 'AbortError') {
+            showToast('Share cancelled', 'info', 2000);
+            return;
+          }
+          console.warn('Share failed, falling back to download:', shareErr);
+        }
+      }
+    }
+
+    // Fallback — download the PNG
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Report downloaded · attach to WhatsApp manually', 'success', 4000);
+
+  } catch (err) {
+    console.error('Report generation failed:', err);
+    showToast('Report generation failed: ' + err.message, 'error', 5000);
+  } finally {
+    if (btn) {
+      btn.classList.remove('spinning');
+      btn.disabled = false;
+    }
+  }
+}
+
 function attachHandlers() {
   document.getElementById('themeBtn').addEventListener('click', () => {
     state.theme = state.theme === 'light' ? 'dark' : 'light';
@@ -2577,6 +2949,13 @@ function attachHandlers() {
     btn.classList.add('spinning');
     fetchData().finally(() => { setTimeout(() => btn.classList.remove('spinning'), 500); });
   });
+
+  const reportBtn = document.getElementById('reportBtn');
+  if (reportBtn) {
+    reportBtn.addEventListener('click', () => {
+      generateAndShareReport();
+    });
+  }
 
   document.getElementById('modeSegment').querySelectorAll('button').forEach(b => {
     b.addEventListener('click', () => {
