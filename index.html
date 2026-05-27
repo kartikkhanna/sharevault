@@ -958,6 +958,128 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
   font-style: italic;
 }
 
+/* =========================================================
+   QUICK NAV — Floating action button (bottom-right) with menu
+   ========================================================= */
+.quick-nav {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  pointer-events: none;  /* children re-enable */
+}
+.quick-nav > * { pointer-events: auto; }
+
+.quick-nav-fab {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--pink);
+  color: #ffffff;
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(230, 0, 126, 0.35), 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease;
+  position: relative;
+}
+.quick-nav-fab:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 10px 28px rgba(230, 0, 126, 0.45), 0 4px 8px rgba(0,0,0,0.12);
+}
+.quick-nav-fab:active { transform: translateY(0) scale(0.98); }
+.quick-nav-fab svg { width: 22px; height: 22px; transition: opacity 180ms ease, transform 180ms ease; }
+.quick-nav-fab .quick-nav-icon-close {
+  position: absolute;
+  opacity: 0;
+  transform: rotate(-45deg);
+}
+.quick-nav.open .quick-nav-fab .quick-nav-icon-menu {
+  opacity: 0;
+  transform: rotate(45deg);
+}
+.quick-nav.open .quick-nav-fab .quick-nav-icon-close {
+  opacity: 1;
+  transform: rotate(0);
+}
+
+.quick-nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--card);
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06);
+  min-width: 220px;
+  opacity: 0;
+  transform: translateY(8px) scale(0.96);
+  transform-origin: bottom right;
+  transition: opacity 200ms ease, transform 200ms ease;
+  pointer-events: none;
+  visibility: hidden;
+}
+[data-theme="dark"] .quick-nav-menu {
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.3);
+}
+.quick-nav.open .quick-nav-menu {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.quick-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 150ms ease, color 150ms ease, transform 100ms ease;
+}
+.quick-nav-item:hover {
+  background: var(--card-tint);
+  color: var(--pink);
+}
+.quick-nav-item:active { transform: scale(0.98); }
+.quick-nav-item.is-active {
+  background: var(--pink-soft);
+  color: var(--pink);
+  font-weight: 600;
+}
+[data-theme="dark"] .quick-nav-item.is-active {
+  background: rgba(230, 0, 126, 0.2);
+}
+.quick-nav-item-icon {
+  width: 18px; height: 18px;
+  flex-shrink: 0;
+  color: var(--slate);
+}
+.quick-nav-item:hover .quick-nav-item-icon,
+.quick-nav-item.is-active .quick-nav-item-icon { color: var(--pink); }
+
+@media (max-width: 600px) {
+  .quick-nav { bottom: 16px; right: 16px; }
+  .quick-nav-fab { width: 48px; height: 48px; }
+  .quick-nav-menu { min-width: 200px; }
+}
+
+@media print {
+  .quick-nav { display: none !important; }
+}
+
 @media print {
   .icon-btn { display: none !important; }
   body { background: white !important; }
@@ -971,6 +1093,39 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
   <div class="loading">
     <div class="loading-dot"></div>
     <div class="loading-label">Loading activation data</div>
+  </div>
+</div>
+
+<!-- Quick jump nav (floating bottom-right) -->
+<div id="quickNav" class="quick-nav" aria-label="Quick navigation">
+  <button class="quick-nav-fab" id="quickNavFab" aria-expanded="false" aria-controls="quickNavMenu" title="Quick jump to section">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="quick-nav-icon-menu">
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="quick-nav-icon-close">
+      <line x1="18" y1="6" x2="6" y2="18"/>
+      <line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </button>
+  <div class="quick-nav-menu" id="quickNavMenu" role="menu">
+    <button class="quick-nav-item" data-target="top" role="menuitem">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="quick-nav-item-icon"><path d="M18 15l-6-6-6 6"/></svg>
+      <span>Top</span>
+    </button>
+    <button class="quick-nav-item" data-target=".span-rejection" role="menuitem">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="quick-nav-item-icon"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+      <span>Rejection Analysis</span>
+    </button>
+    <button class="quick-nav-item" data-target=".span-budget" role="menuitem">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="quick-nav-item-icon"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      <span>Budget Utilisation</span>
+    </button>
+    <button class="quick-nav-item" data-target=".span-forecast" role="menuitem">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="quick-nav-item-icon"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span>Budget Forecast</span>
+    </button>
   </div>
 </div>
 
@@ -2082,11 +2237,11 @@ function render() {
       <div class="brand-block">
         <div class="title-stack">
           <div class="title">The Vault</div>
-          <div class="subtitle">Real-time performance read-out · Emirates NBD × Visa × Majid Al Futtaim</div>
+          <div class="subtitle">Performance Report</div>
         </div>
       </div>
       <div class="meta-block">
-        <div class="partners">ENBD · Visa · MAF</div>
+        <div class="partners">ENBD · SHARE · Visa</div>
         <div class="timestamp" title="Exact: ${fmt.timestamp(raw.dataLastUpdated || raw.generatedAt)}${raw.dataLastUpdated ? '' : ' (sheet timestamp not available — showing page fetch time)'}">
           Data ${fmt.relativeTime(raw.dataLastUpdated || raw.generatedAt)}
         </div>
@@ -2143,7 +2298,7 @@ function render() {
         <div class="kpi-card">
           <div class="kpi-label">Card Holders</div>
           <div class="kpi-value">${fmt.num(m.cardHolders)}</div>
-          <div class="kpi-sub">SHARE Visa verified</div>
+          <div class="kpi-sub">Card Verified</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Non-Cardholders</div>
@@ -2795,10 +2950,10 @@ function buildReportHtml(raw) {
       <div class="report-header">
         <div class="report-header-left">
           <div class="report-title">${reportTitle}</div>
-          <div class="report-subtitle">Emirates NBD × Visa × Majid Al Futtaim · ${reportDate}</div>
+          <div class="report-subtitle">Emirates NBD × Visa × SHARE · ${reportDate}</div>
         </div>
         <div class="report-header-right">
-          <div class="report-partners">ENBD · VISA · MAF</div>
+          <div class="report-partners">ENBD · VISA · SHARE</div>
         </div>
       </div>
 
@@ -3219,6 +3374,104 @@ setInterval(() => {
   if (!state.raw) return;
   updateStaleIndicator();
 }, 60000);
+
+// =============================================================
+// QUICK NAV — Floating jump menu (independent of main dashboard render)
+// =============================================================
+(function initQuickNav() {
+  const nav = document.getElementById('quickNav');
+  const fab = document.getElementById('quickNavFab');
+  const menu = document.getElementById('quickNavMenu');
+  if (!nav || !fab || !menu) return;
+
+  const items = Array.from(menu.querySelectorAll('.quick-nav-item'));
+
+  function setOpen(open) {
+    nav.classList.toggle('open', open);
+    fab.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  // Toggle on FAB click
+  fab.addEventListener('click', e => {
+    e.stopPropagation();
+    setOpen(!nav.classList.contains('open'));
+  });
+
+  // Close when clicking outside
+  document.addEventListener('click', e => {
+    if (!nav.contains(e.target)) setOpen(false);
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && nav.classList.contains('open')) setOpen(false);
+  });
+
+  // Smooth-scroll on item click
+  items.forEach(item => {
+    item.addEventListener('click', () => {
+      const target = item.dataset.target;
+      let el = null;
+      if (target === 'top') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        el = document.querySelector(target);
+        if (el) {
+          // Offset for sticky header (~80px breathing room)
+          const top = el.getBoundingClientRect().top + window.pageYOffset - 80;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
+      }
+      setOpen(false);
+    });
+  });
+
+  // Scrollspy — highlight the section currently in view
+  // Throttle with rAF so it's smooth even on heavy scroll
+  let ticking = false;
+  function updateActiveSection() {
+    const sections = [
+      { target: 'top', el: null, threshold: 200 }, // "Top" active when near page top
+      { target: '.span-rejection', el: document.querySelector('.span-rejection') },
+      { target: '.span-budget',    el: document.querySelector('.span-budget') },
+      { target: '.span-forecast',  el: document.querySelector('.span-forecast') }
+    ];
+
+    let activeTarget = 'top';
+    if (window.scrollY < 200) {
+      activeTarget = 'top';
+    } else {
+      // Find the section whose top is most recently above the viewport's upper third
+      const viewportMark = window.scrollY + window.innerHeight * 0.33;
+      let bestY = -Infinity;
+      for (const s of sections) {
+        if (!s.el) continue;
+        const top = s.el.getBoundingClientRect().top + window.pageYOffset;
+        if (top <= viewportMark && top > bestY) {
+          bestY = top;
+          activeTarget = s.target;
+        }
+      }
+    }
+
+    items.forEach(item => {
+      item.classList.toggle('is-active', item.dataset.target === activeTarget);
+    });
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(updateActiveSection);
+      ticking = true;
+    }
+  }, { passive: true });
+
+  // Also update on resize and after data load (sections may shift)
+  window.addEventListener('resize', updateActiveSection);
+  // Initial state after a tick (sections render asynchronously)
+  setTimeout(updateActiveSection, 500);
+})();
 </script>
 </body>
 </html>
