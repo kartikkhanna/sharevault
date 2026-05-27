@@ -631,6 +631,173 @@ body { background: var(--page-bg); color: var(--ink); transition: background 240
   line-height: 1.4;
 }
 
+/* =========================================================
+   FORECAST — Side-by-side Baseline vs Tighter Run
+   ========================================================= */
+.forecast-compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 8px 0 16px;
+}
+@media (max-width: 1100px) { .forecast-compare-grid { grid-template-columns: 1fr; } }
+
+.forecast-card {
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.forecast-card-baseline {
+  background: linear-gradient(180deg, #fff5fa 0%, #ffffff 100%);
+  border-color: #f5c8de;
+}
+.forecast-card-tighter {
+  background: linear-gradient(180deg, #f0f9f3 0%, #ffffff 100%);
+  border-color: #c8e0d0;
+}
+[data-theme="dark"] .forecast-card-baseline {
+  background: linear-gradient(180deg, rgba(230,0,126,0.08) 0%, rgba(255,255,255,0.02) 100%);
+  border-color: rgba(230,0,126,0.3);
+}
+[data-theme="dark"] .forecast-card-tighter {
+  background: linear-gradient(180deg, rgba(31,138,76,0.08) 0%, rgba(255,255,255,0.02) 100%);
+  border-color: rgba(31,138,76,0.3);
+}
+
+.forecast-card-head { display: flex; flex-direction: column; gap: 4px; }
+.forecast-card-title {
+  font-size: 13px; font-weight: 700; color: var(--ink); letter-spacing: -0.005em;
+}
+.forecast-card-sub { font-size: 10.5px; color: var(--slate); font-weight: 500; line-height: 1.35; }
+
+.forecast-card-bar-wrap { display: flex; flex-direction: column; gap: 14px; padding-top: 8px; }
+.forecast-card-bar-legend {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--slate);
+}
+.forecast-card-bar-legend strong { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+.forecast-card-bar-legend .dot {
+  display: inline-block; width: 8px; height: 8px;
+  border-radius: 50%; margin-right: 6px; vertical-align: middle;
+}
+.forecast-card-bar-legend .confirmed-dot { background: var(--pink); }
+.forecast-card-bar-legend .projected-dot { background: var(--pink-soft); opacity: 0.5; }
+.forecast-card-bar-legend .projected-dot.over { background: var(--danger); opacity: 0.6; }
+
+.forecast-card-verdict {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: 8px;
+  font-size: 12px; font-weight: 500;
+}
+.forecast-card-verdict.over {
+  background: rgba(200,16,46,0.08);
+  color: var(--danger);
+}
+.forecast-card-verdict.under {
+  background: rgba(31,138,76,0.08);
+  color: var(--success);
+}
+.forecast-card-verdict strong { font-weight: 700; font-variant-numeric: tabular-nums; }
+.forecast-card-verdict .verdict-icon { font-size: 14px; }
+
+.forecast-card-note {
+  font-size: 10.5px;
+  color: var(--slate);
+  padding: 6px 10px;
+  background: rgba(0,0,0,0.03);
+  border-radius: 6px;
+  line-height: 1.4;
+}
+.forecast-card-note strong { color: var(--ink); font-weight: 700; }
+[data-theme="dark"] .forecast-card-note { background: rgba(255,255,255,0.04); }
+
+.forecast-savings-banner {
+  background: linear-gradient(135deg, var(--success-tint) 0%, #f0f9f3 100%);
+  border: 1px solid rgba(31,138,76,0.25);
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+[data-theme="dark"] .forecast-savings-banner {
+  background: linear-gradient(135deg, rgba(31,138,76,0.15) 0%, rgba(31,138,76,0.05) 100%);
+  border-color: rgba(31,138,76,0.4);
+}
+.forecast-savings-banner.neutral {
+  background: var(--card-tint);
+  border-color: var(--hairline);
+}
+.forecast-savings-banner .savings-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--success);
+}
+.forecast-savings-banner.neutral .savings-label { color: var(--slate); }
+.forecast-savings-banner .savings-amount {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--success);
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.forecast-sliders {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--card-tint);
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+}
+.forecast-slider-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(120px, 2fr) 50px;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--slate);
+}
+@media (max-width: 700px) {
+  .forecast-slider-row { grid-template-columns: 1fr; }
+}
+.forecast-slider-label { font-weight: 600; }
+.forecast-slider-value {
+  font-weight: 700;
+  color: var(--pink);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.loc-compare {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.loc-compare-item {
+  display: flex; flex-direction: column; gap: 2px;
+  font-size: 11px;
+}
+.loc-compare-label {
+  font-size: 9px; font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.loc-compare-item .loc-projected { font-size: 12px; font-weight: 700; color: var(--pink); }
+.loc-compare-item .loc-projected.tight { color: var(--success); }
+.loc-compare-item.savings .loc-savings {
+  font-size: 12px; font-weight: 700; color: var(--success);
+}
+
 .loading { min-height: 70vh; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
 .loading-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--pink); animation: pulse 1400ms ease-in-out infinite; }
 .loading-label { font-size: 11px; font-weight: 600; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; }
@@ -703,7 +870,7 @@ const CONFIG = {
 const state = {
   raw: null,
   filters: { mode: 'all', date: null, location: 'all' },
-  rates: { signup: 0.15, lead: 0.30, approval: 0.10 },
+  rates: { signup: 0.15, lead: 0.30, approval: 0.10, giftCard: 0.80, warmConv: 0.20 },
   levers: {},  // toggled budget levers — { leverId: true/false }
   theme: 'light',
   charts: {},
@@ -1222,6 +1389,175 @@ function computeForecast(raw, approvalRate) {
 }
 
 // =============================================================
+// WARM LEADS — count current warm-categorised NCH rows
+// =============================================================
+// Mirrors the rejection categoriser in buildRejectionData but only counts.
+// Warm = had a path back, not outright rejected. Used in Baseline forecast bonus.
+function countWarmLeads(raw) {
+  let warmCount = 0;
+  for (const row of raw.nonCardHolders) {
+    if (String(row.applied || '').trim().toUpperCase() === 'Y') continue;  // already applied, not warm
+    const comment = (row.comment || '').trim();
+    if (!comment) continue;
+    const rule = categorizeComment(comment);
+    if (rule && rule.bucket === 'warm') warmCount++;
+  }
+  return warmCount;
+}
+
+// =============================================================
+// NCH SHARE PRIZE TIER MIX — for Tighter Run forecast
+// =============================================================
+// Tighter Run keeps only the AED 250 tier of NCH SHARE Points and drops
+// the higher tiers (500/1000/2500) and Noor Box from future spend.
+// We need to know what fraction of past NCH SHARE spend was the 250 tier
+// so we can scale future spend accordingly.
+function computeNchTierMix(raw) {
+  let nchSpendByLabel = {};
+  let totalNchShareSpend = 0;
+  for (const row of raw.nonCardHolders) {
+    if (!row.prize) continue;
+    const m = lookupPrizeCost(row.prize);
+    if (!m || m.funder !== 'share') continue;
+    nchSpendByLabel[m.label] = (nchSpendByLabel[m.label] || 0) + m.cost;
+    totalNchShareSpend += m.cost;
+  }
+  // Tighter Run keeps ONLY the AED 250 tier
+  const kept250 = nchSpendByLabel['SHARE Points (AED 250)'] || 0;
+  const tighterRunShareFraction = totalNchShareSpend > 0 ? kept250 / totalNchShareSpend : 0;
+  return {
+    breakdown: nchSpendByLabel,
+    totalNchShareSpend,
+    tighterRunShareFraction  // 0..1 — % of NCH SHARE spend that survives in Tighter Run
+  };
+}
+
+// =============================================================
+// CH SHARE FRACTION — used to subtract CH SHARE from future spend in Tighter Run
+// =============================================================
+function computeChShareFraction(raw, approvalRate) {
+  // What fraction of total expected SHARE spend (CH confirmed + NCH expected) is the CH portion?
+  let chShare = 0;
+  for (const row of raw.cardHolders) {
+    if (!row.prize) continue;
+    const m = lookupPrizeCost(row.prize);
+    if (m && m.funder === 'share') chShare += m.cost;
+  }
+  let nchShareFull = 0;
+  for (const row of raw.nonCardHolders) {
+    if (!row.prize) continue;
+    const m = lookupPrizeCost(row.prize);
+    if (m && m.funder === 'share') nchShareFull += m.cost;
+  }
+  const appliedCount = raw.nonCardHolders.filter(r => r.applied === 'Y').length;
+  const giftCardTotal = appliedCount * 50;
+  const nchShareExpected = nchShareFull * approvalRate;
+  const totalExpected = chShare + nchShareExpected + giftCardTotal;
+  return {
+    chShare,
+    nchShareFull,
+    nchShareExpected,
+    giftCardTotal,
+    totalExpected,
+    chFraction: totalExpected > 0 ? chShare / totalExpected : 0,
+    nchFraction: totalExpected > 0 ? nchShareExpected / totalExpected : 0,
+    giftCardFraction: totalExpected > 0 ? giftCardTotal / totalExpected : 0
+  };
+}
+
+// =============================================================
+// TIGHTER RUN FORECAST
+// =============================================================
+// Same base as computeForecast, but future spend is re-derived using Tighter Run rules:
+//   - Future CH SHARE prizes = 0
+//   - Future NCH SHARE = only AED 250 tier survives (others zeroed)
+//   - Future Noor Box = 0
+//   - Future Gift Cards = applied_rate × gift_card_rate × AED 50
+//   - No warm lead bonus
+function computeTighterRunForecast(raw, approvalRate, giftCardRate) {
+  const baseline = computeForecast(raw, approvalRate);
+  const today = todayISO();
+  const fractions = computeChShareFraction(raw, approvalRate);
+  const tierMix = computeNchTierMix(raw);
+
+  // For each location's future spend, compute the Tighter Run alternate.
+  // Baseline future spend = currentDailyRate × daysRemaining
+  // That future spend is composed of:
+  //   chFraction → 0 in Tighter Run
+  //   nchFraction → × tierMix.tighterRunShareFraction (only 250 tier kept)
+  //   giftCardFraction → × giftCardRate (only review/approve get gift card)
+  // The new daily-rate multiplier:
+  const futureMultiplier =
+    0 * fractions.chFraction +
+    tierMix.tighterRunShareFraction * fractions.nchFraction +
+    giftCardRate * fractions.giftCardFraction;
+
+  const tighterForecasts = baseline.forecasts.map(f => {
+    const newFuture = Math.round(f.futureSpend * futureMultiplier);
+    return {
+      ...f,
+      futureSpend: newFuture,
+      projectedEnd: f.currentSpend + newFuture
+    };
+  });
+
+  const totalCurrent = tighterForecasts.reduce((a, f) => a + f.currentSpend, 0);
+  const totalFuture = tighterForecasts.reduce((a, f) => a + f.futureSpend, 0);
+  const totalProjected = totalCurrent + totalFuture;
+
+  return {
+    forecasts: tighterForecasts,
+    totalCurrent,
+    totalFuture,
+    totalProjected,
+    ceiling: SHARE_BUDGET_CEILING,
+    overBy: Math.max(0, totalProjected - SHARE_BUDGET_CEILING),
+    underBy: Math.max(0, SHARE_BUDGET_CEILING - totalProjected),
+    futureMultiplier,  // for debug / display
+    debug: { fractions, tierMix }
+  };
+}
+
+// =============================================================
+// WARM LEAD BONUS (Baseline only)
+// =============================================================
+// Adds the expected additional spend from warm leads converting later.
+// Each converting warm lead unlocks their previously-contingent NCH SHARE prize.
+// The dashboard already counts these in contingent × approval_rate.
+// Warm conversion shifts them from "approval_rate" to higher landing rate.
+// Net additional cost per converted warm lead: their_prize × (1 - approval_rate)
+function addWarmLeadBonus(baseline, raw, warmConversionRate, approvalRate) {
+  // Sum the SHARE prize value of warm-categorised NCH rows
+  let warmSharePrizeTotal = 0;
+  let warmCount = 0;
+  for (const row of raw.nonCardHolders) {
+    if (String(row.applied || '').trim().toUpperCase() === 'Y') continue;
+    const comment = (row.comment || '').trim();
+    if (!comment) continue;
+    const rule = categorizeComment(comment);
+    if (!rule || rule.bucket !== 'warm') continue;
+    warmCount++;
+    if (!row.prize) continue;
+    const m = lookupPrizeCost(row.prize);
+    if (m && m.funder === 'share') warmSharePrizeTotal += m.cost;
+  }
+  // Without warm conversion, these prizes land at approval_rate.
+  // With warm conversion, the converted ones (warmConversionRate %) land at 100%.
+  // Net additional spend = warmSharePrizeTotal × warmConversionRate × (1 - approval_rate)
+  const warmBonus = Math.round(warmSharePrizeTotal * warmConversionRate * (1 - approvalRate));
+
+  return {
+    ...baseline,
+    totalProjected: baseline.totalProjected + warmBonus,
+    overBy: Math.max(0, baseline.totalProjected + warmBonus - baseline.ceiling),
+    underBy: Math.max(0, baseline.ceiling - baseline.totalProjected - warmBonus),
+    warmBonus,
+    warmCount,
+    warmSharePrizeTotal
+  };
+}
+
+// =============================================================
 // BUDGET LEVERS — model what-if scenarios
 // =============================================================
 // Each lever computes a "savings" amount in AED. User toggles ON to subtract from forecast.
@@ -1325,31 +1661,62 @@ function computeLevers(raw, approvalRate, forecast) {
   return levers;
 }
 
-function renderForecastSection(forecast, levers, activeLevers, raw, approvalRate) {
-  const totalSavings = levers.filter(l => activeLevers[l.id]).reduce((a, l) => a + l.savings, 0);
-  const projectedAfterLevers = forecast.totalProjected - totalSavings;
-  const ceiling = forecast.ceiling;
-  const overOrUnderRaw = ceiling - projectedAfterLevers;
-  const isOver = overOrUnderRaw < 0;
+function renderForecastSection(baselineForecast, tighterForecast, raw, approvalRate, giftCardRate, warmConvRate) {
+  const ceiling = baselineForecast.ceiling;
 
-  // Progress bar math
-  const ceilingBarPct = 100;
-  const currentBarPct = Math.min(100, (forecast.totalCurrent / ceiling) * 100);
-  const projectedBarPct = Math.min(100, (projectedAfterLevers / ceiling) * 100);
-  const overflowPct = projectedAfterLevers > ceiling ? Math.min(100, ((projectedAfterLevers - ceiling) / ceiling) * 100) : 0;
+  // Build a forecast CARD (used twice — once for Baseline, once for Tighter Run)
+  const buildForecastCard = (forecast, opts) => {
+    const projected = forecast.totalProjected;
+    const isOver = projected > ceiling;
+    const delta = Math.abs(ceiling - projected);
 
-  // Per-location rendering
-  const buildLocationRow = (f) => {
+    // Bar scale: max(this projection, ceiling) so the bar always fits inside the card
+    const scaleMax = Math.max(projected, ceiling);
+    const confirmedPct = scaleMax > 0 ? (forecast.totalCurrent / scaleMax) * 100 : 0;
+    const projectedPct = scaleMax > 0 ? (projected / scaleMax) * 100 : 0;
+    const targetMarkerPct = scaleMax > 0 ? (ceiling / scaleMax) * 100 : 100;
+
+    return `
+      <div class="forecast-card forecast-card-${opts.variant}">
+        <div class="forecast-card-head">
+          <div class="forecast-card-title">${opts.title}</div>
+          <div class="forecast-card-sub">${opts.subtitle}</div>
+        </div>
+
+        <div class="forecast-card-bar-wrap">
+          <div class="forecast-bar-track">
+            <div class="forecast-bar-fill confirmed" style="width:${confirmedPct}%"></div>
+            <div class="forecast-bar-fill projected ${isOver ? 'projected-over' : ''}" style="left:${confirmedPct}%; width:${Math.max(0, projectedPct - confirmedPct)}%"></div>
+            <div class="forecast-bar-target-marker" style="left:${targetMarkerPct}%"></div>
+          </div>
+          <div class="forecast-card-bar-legend">
+            <span><span class="dot confirmed-dot"></span>Confirmed <strong>AED ${fmt.num(forecast.totalCurrent)}</strong></span>
+            <span><span class="dot projected-dot ${isOver ? 'over' : ''}"></span>Projected end <strong>AED ${fmt.num(projected)}</strong></span>
+          </div>
+        </div>
+
+        <div class="forecast-card-verdict ${isOver ? 'over' : 'under'}">
+          ${isOver
+            ? `<span class="verdict-icon">⚠</span><span>Over target by <strong>AED ${fmt.num(delta)}</strong></span>`
+            : `<span class="verdict-icon">✓</span><span>Under target by <strong>AED ${fmt.num(delta)}</strong></span>`
+          }
+        </div>
+
+        ${opts.extraNote ? `<div class="forecast-card-note">${opts.extraNote}</div>` : ''}
+      </div>
+    `;
+  };
+
+  // Per-location row showing BOTH baseline and tighter run projections side by side
+  const buildLocationCompareRow = (baseF, tightF) => {
+    const f = baseF;  // same metadata
     const statusBadge = f.status === 'complete' ? '<span class="loc-badge complete">Complete</span>' :
                        f.status === 'not_started' ? '<span class="loc-badge pending">Not started</span>' :
                        '<span class="loc-badge live">Live</span>';
-    const isPending = f.status === 'not_started';
-    const projection = isPending
-      ? `<span class="loc-est">est. AED ${fmt.num(f.projectedEnd)}</span>`
-      : `<span class="loc-spend">AED ${fmt.num(f.currentSpend)}</span> <span class="loc-arrow">→</span> <span class="loc-projected">AED ${fmt.num(f.projectedEnd)}</span>`;
     const dayInfo = f.status === 'complete' ? `${f.daysTotal} days · done` :
-                    f.status === 'not_started' ? `${f.daysTotal} days planned · estimated from MoE/DCC` :
+                    f.status === 'not_started' ? `${f.daysTotal} days planned · est. from peers` :
                     `${f.daysElapsed} of ${f.daysTotal} days · ${f.daysRemaining} left`;
+    const savings = baseF.projectedEnd - tightF.projectedEnd;
     return `
       <div class="loc-row">
         <div class="loc-row-head">
@@ -1359,65 +1726,91 @@ function renderForecastSection(forecast, levers, activeLevers, raw, approvalRate
         </div>
         <div class="loc-row-body">
           <div class="loc-meta">${dayInfo}</div>
-          <div class="loc-money">${projection}</div>
+          <div class="loc-compare">
+            <div class="loc-compare-item">
+              <span class="loc-compare-label">Baseline</span>
+              <span class="loc-projected">AED ${fmt.num(baseF.projectedEnd)}</span>
+            </div>
+            <div class="loc-compare-item">
+              <span class="loc-compare-label">Tighter Run</span>
+              <span class="loc-projected tight">AED ${fmt.num(tightF.projectedEnd)}</span>
+            </div>
+            ${savings > 0 ? `<div class="loc-compare-item savings">
+              <span class="loc-compare-label">Savings</span>
+              <span class="loc-savings">−AED ${fmt.num(savings)}</span>
+            </div>` : ''}
+          </div>
         </div>
       </div>
     `;
   };
 
-  // Sort levers by savings (highest first) for the ranked suggestions
-  const rankedLevers = [...levers]
-    .filter(l => l.applicable && l.savings > 0)
-    .sort((a, b) => b.savings - a.savings);
+  const baselineProjected = baselineForecast.totalProjected;
+  const tighterProjected = tighterForecast.totalProjected;
+  const totalSavings = baselineProjected - tighterProjected;
 
   return `
     <div class="chart-card span-forecast fade-in d5">
       <div class="section-head">
         <span><span class="label-soft">Budget</span> Forecast</span>
-        <span class="small-meta">Target: AED ${fmt.num(ceiling)} · ${isOver ? `<span style="color:var(--danger);font-weight:700;">Over by AED ${fmt.num(Math.abs(overOrUnderRaw))}</span>` : `<span style="color:var(--success);font-weight:700;">Under by AED ${fmt.num(overOrUnderRaw)}</span>`}</span>
+        <span class="small-meta">Target: AED ${fmt.num(ceiling)} · two-scenario comparison</span>
       </div>
 
-      <!-- Headline Bar -->
-      <div class="forecast-bar-wrap">
-        ${(() => {
-          // Scale bar to max(projected, target) so it always fits.
-          // Confirmed fill % = confirmed / scaleMax
-          // Projected fill % = projected / scaleMax
-          // Target marker pos % = target / scaleMax
-          const scaleMax = Math.max(projectedAfterLevers, ceiling);
-          const confirmedPct = scaleMax > 0 ? (forecast.totalCurrent / scaleMax) * 100 : 0;
-          const projectedPct = scaleMax > 0 ? (projectedAfterLevers / scaleMax) * 100 : 0;
-          const targetMarkerPct = scaleMax > 0 ? (ceiling / scaleMax) * 100 : 100;
-          const isProjOver = projectedAfterLevers > ceiling;
-          return `
-            <div class="forecast-bar-track">
-              <div class="forecast-bar-fill confirmed" style="width:${confirmedPct}%" title="Spent so far: AED ${fmt.num(forecast.totalCurrent)}"></div>
-              <div class="forecast-bar-fill projected ${isProjOver ? 'projected-over' : ''}" style="left:${confirmedPct}%; width:${Math.max(0, projectedPct - confirmedPct)}%" title="Forecast to add: AED ${fmt.num(projectedAfterLevers - forecast.totalCurrent)}"></div>
-              <div class="forecast-bar-target-marker" style="left:${targetMarkerPct}%"></div>
-            </div>
-          `;
-        })()}
-        <div class="forecast-bar-labels">
-          <div class="bar-label-left">
-            <span class="dot confirmed-dot"></span>Confirmed <strong>AED ${fmt.num(forecast.totalCurrent)}</strong>
-          </div>
-          <div class="bar-label-mid">
-            <span class="dot projected-dot"></span>Projected end <strong>AED ${fmt.num(projectedAfterLevers)}</strong>${totalSavings > 0 ? ` <span style="color:var(--success);font-weight:600;">(−${fmt.num(totalSavings)} from levers)</span>` : ''}
-          </div>
-          <div class="bar-label-right">
-            <span class="dot ceiling-dot"></span>Target <strong>AED ${fmt.num(ceiling)}</strong>
-          </div>
+      <div class="forecast-compare-grid">
+        ${buildForecastCard(baselineForecast, {
+          variant: 'baseline',
+          title: 'Current Mechanic',
+          subtitle: 'CH gets SHARE Points + Noor Box · NCH gets all tiers · Gift card to every Applied=Y · includes warm-lead conversion bonus',
+          extraNote: baselineForecast.warmCount > 0
+            ? `+AED ${fmt.num(baselineForecast.warmBonus)} from <strong>${baselineForecast.warmCount}</strong> warm leads × <strong>${fmt.pct(warmConvRate)}</strong> conversion`
+            : ''
+        })}
+        ${buildForecastCard(tighterForecast, {
+          variant: 'tighter',
+          title: 'Tighter Run (Starting Today)',
+          subtitle: 'CH: only raffle tickets & partner prizes · NCH: only AED 250 SP tier + partner prizes · Gift cards only on review/approve · no warm-lead bonus',
+          extraNote: `Future spend at <strong>${fmt.pct(tighterForecast.futureMultiplier)}</strong> of baseline · Gift card to <strong>${fmt.pct(giftCardRate)}</strong> of sign-ups`
+        })}
+      </div>
+
+      ${totalSavings > 0 ? `
+        <div class="forecast-savings-banner">
+          <span class="savings-label">Switching to Tighter Run from today saves</span>
+          <span class="savings-amount">AED ${fmt.num(totalSavings)}</span>
+        </div>
+      ` : `
+        <div class="forecast-savings-banner neutral">
+          <span class="savings-label">Tighter Run produces no meaningful savings vs current run</span>
+        </div>
+      `}
+
+      <!-- Sliders -->
+      <div class="forecast-sliders">
+        <div class="forecast-slider-row">
+          <span class="forecast-slider-label">Approval rate (NCH SHARE Points landing)</span>
+          <input type="range" class="rate-slider" id="approvalSlider2" min="0" max="100" value="${approvalRate*100}" step="1" />
+          <span class="forecast-slider-value" id="approvalRateLabel2">${fmt.pct(approvalRate)}</span>
+        </div>
+        <div class="forecast-slider-row">
+          <span class="forecast-slider-label">Gift card rate (Tighter Run — % of sign-ups in review/approve)</span>
+          <input type="range" class="rate-slider" id="giftCardSlider" min="0" max="100" value="${giftCardRate*100}" step="1" />
+          <span class="forecast-slider-value" id="giftCardRateLabel">${fmt.pct(giftCardRate)}</span>
+        </div>
+        <div class="forecast-slider-row">
+          <span class="forecast-slider-label">Warm-lead conversion rate (Baseline only)</span>
+          <input type="range" class="rate-slider" id="warmConvSlider" min="0" max="100" value="${warmConvRate*100}" step="1" />
+          <span class="forecast-slider-value" id="warmConvRateLabel">${fmt.pct(warmConvRate)}</span>
         </div>
       </div>
 
       <!-- Per-location -->
-      <div class="forecast-section-title">Per-Location Burn</div>
+      <div class="forecast-section-title">Per-Location Burn <span class="forecast-section-sub">— Baseline vs Tighter Run projection per mall</span></div>
       <div class="loc-grid">
-        ${forecast.forecasts.map(buildLocationRow).join('')}
+        ${baselineForecast.forecasts.map((bf, i) => buildLocationCompareRow(bf, tighterForecast.forecasts[i])).join('')}
       </div>
 
       <div class="forecast-disclaimer">
-        ⚠ Forecast uses location-aware projection: MoE/DCC at current daily rate, MCC estimated from MoE + DCC averages. Contingent NCH spend included at ${fmt.pct(approvalRate)} approval rate.
+        ⚠ Forecast uses location-aware projection: MoE/DCC at current daily rate, MCC estimated from MoE + DCC averages. Past spend (Confirmed + Contingent) is locked in both views — only future spend changes between the two mechanics.
       </div>
     </div>
   `;
@@ -1553,8 +1946,14 @@ function render() {
   const estCardsIssued = Math.round(totalApplied * state.rates.lead);
 
   const budget = computeBudget(filtered, state.rates.approval);
-  const forecast = computeForecast(raw, state.rates.approval);
-  const levers = computeLevers(raw, state.rates.approval, forecast);
+  const baselineForecast = addWarmLeadBonus(
+    computeForecast(raw, state.rates.approval),
+    raw,
+    state.rates.warmConv,
+    state.rates.approval
+  );
+  const tighterForecast = computeTighterRunForecast(raw, state.rates.approval, state.rates.giftCard);
+  const levers = computeLevers(raw, state.rates.approval, baselineForecast);
 
   const dq = raw.dataQuality || {};
 
@@ -1569,11 +1968,11 @@ function render() {
       <div class="brand-block">
         <div class="title-stack">
           <div class="title">The Vault</div>
-          <div class="subtitle">Performance Dashboard · Emirates NBD × Visa × SHARE</div>
+          <div class="subtitle">Real-time performance read-out · Emirates NBD × Visa × Majid Al Futtaim</div>
         </div>
       </div>
       <div class="meta-block">
-        <div class="partners">ENBD · SHARE · Visa</div>
+        <div class="partners">ENBD · Visa · MAF</div>
         <div class="timestamp" title="Exact: ${fmt.timestamp(raw.dataLastUpdated || raw.generatedAt)}${raw.dataLastUpdated ? '' : ' (sheet timestamp not available — showing page fetch time)'}">
           Data ${fmt.relativeTime(raw.dataLastUpdated || raw.generatedAt)}
         </div>
@@ -1629,7 +2028,7 @@ function render() {
         <div class="kpi-card">
           <div class="kpi-label">Card Holders</div>
           <div class="kpi-value">${fmt.num(m.cardHolders)}</div>
-          <div class="kpi-sub">Card Verified</div>
+          <div class="kpi-sub">SHARE Visa verified</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Non-Cardholders</div>
@@ -1781,7 +2180,7 @@ function render() {
 
       ${renderBudgetSection(budget, state.rates.approval)}
 
-      ${renderForecastSection(forecast, levers, state.levers, raw, state.rates.approval)}
+      ${renderForecastSection(baselineForecast, tighterForecast, raw, state.rates.approval, state.rates.giftCard, state.rates.warmConv)}
 
     </div>
   </div>
@@ -2229,6 +2628,9 @@ function attachHandlers() {
     });
   }
 
+  // Forecast section sliders (gift card rate + warm conversion rate)
+  attachForecastSliderHandlers();
+
   // Lever checkboxes — toggle savings impact
   document.querySelectorAll('input[data-lever]').forEach(cb => {
     cb.addEventListener('change', e => {
@@ -2261,24 +2663,57 @@ function updateBudgetSection() {
   }
 }
 
-// Patch in only the forecast section (used when levers toggle or approval changes)
+// Patch in only the forecast section (used when sliders move)
 function updateForecastSection() {
   if (!state.raw) return;
-  const forecast = computeForecast(state.raw, state.rates.approval);
-  const levers = computeLevers(state.raw, state.rates.approval, forecast);
+  const baselineForecast = addWarmLeadBonus(
+    computeForecast(state.raw, state.rates.approval),
+    state.raw,
+    state.rates.warmConv,
+    state.rates.approval
+  );
+  const tighterForecast = computeTighterRunForecast(state.raw, state.rates.approval, state.rates.giftCard);
   const existing = document.querySelector('.span-forecast');
   if (!existing) return;
   const wrapper = document.createElement('div');
-  wrapper.innerHTML = renderForecastSection(forecast, levers, state.levers, state.raw, state.rates.approval);
+  wrapper.innerHTML = renderForecastSection(baselineForecast, tighterForecast, state.raw, state.rates.approval, state.rates.giftCard, state.rates.warmConv);
   existing.replaceWith(wrapper.firstElementChild);
-  // Re-attach checkbox handlers (DOM was replaced)
-  document.querySelectorAll('input[data-lever]').forEach(cb => {
-    cb.addEventListener('change', e => {
-      const leverId = e.target.dataset.lever;
-      state.levers[leverId] = e.target.checked;
+  attachForecastSliderHandlers();
+}
+
+// Attach handlers for the forecast section sliders (approval + gift card + warm)
+function attachForecastSliderHandlers() {
+  // Approval rate slider (duplicated inside forecast section for convenience)
+  const approvalSlider2 = document.getElementById('approvalSlider2');
+  if (approvalSlider2) {
+    approvalSlider2.addEventListener('input', e => {
+      state.rates.approval = parseInt(e.target.value) / 100;
+      document.getElementById('approvalRateLabel2').textContent = fmt.pct(state.rates.approval);
+      // Also sync the budget section's approval slider if visible
+      const otherSlider = document.getElementById('approvalSlider');
+      const otherLabel = document.getElementById('approvalRateLabel');
+      if (otherSlider) otherSlider.value = e.target.value;
+      if (otherLabel) otherLabel.textContent = fmt.pct(state.rates.approval);
+      updateBudgetSection();
       updateForecastSection();
     });
-  });
+  }
+  const giftCardSlider = document.getElementById('giftCardSlider');
+  if (giftCardSlider) {
+    giftCardSlider.addEventListener('input', e => {
+      state.rates.giftCard = parseInt(e.target.value) / 100;
+      document.getElementById('giftCardRateLabel').textContent = fmt.pct(state.rates.giftCard);
+      updateForecastSection();
+    });
+  }
+  const warmSlider = document.getElementById('warmConvSlider');
+  if (warmSlider) {
+    warmSlider.addEventListener('input', e => {
+      state.rates.warmConv = parseInt(e.target.value) / 100;
+      document.getElementById('warmConvRateLabel').textContent = fmt.pct(state.rates.warmConv);
+      updateForecastSection();
+    });
+  }
 }
 
 function updateProjections() {
