@@ -2860,12 +2860,36 @@ function getReportData(raw, date, location) {
   return computeReportDay(raw, date, location);
 }
 
-// Build the list of dates we need to show: May 15 to today
+// Build the list of dates we need to show: May 15 to today.
+// Rule: if TODAY shows 0 total in ANY active mall block, drop today's column
+// from the whole report (and totals, which sum only the shown dates).
 function getReportDates(raw) {
   const start = '2026-05-15';
   const today = todayISO();
-  return eachDate(start, today);
+  const allDates = eachDate(start, today);
+
+  // Mall blocks and the date each one goes live (matches buildReportHtml).
+  const blocks = [
+    { key: 'MoE', startDate: '2026-05-15' },
+    { key: 'DCC', startDate: '2026-05-23' },
+    { key: 'MCC', startDate: '2026-06-01' }
+  ];
+
+  // Only judge malls that are actually live today — a block that hasn't
+  // started yet is legitimately blank and shouldn't trigger removal.
+  const liveToday = blocks.filter(b => today >= b.startDate);
+
+  const todayHasZero = liveToday.some(b => {
+    const d = getReportData(raw, today, b.key);
+    return !d || d.total === 0;
+  });
+
+  if (todayHasZero && allDates.length > 1) {
+    allDates.pop(); // remove today
+  }
+  return allDates;
 }
+
 
 // Build a single block (Total / MoE / DCC / MCC) as an HTML table fragment
 function buildReportBlock(raw, blockTitle, locationKey, dates, blockStartDate) {
